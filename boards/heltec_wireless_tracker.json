@@ -1,0 +1,177 @@
+{
+    "build": {
+        "core": "esp32",
+        "extra_flags": [
+            "-DHELTEC_WIRELESS_TRACKER",
+            "-DREGION_EU868",
+            "-DRADIO_CHIP_SX1262",
+            "-DACTIVE_REGION=LORAMAC_REGION_EU868",
+            "-DLORAWAN_PREAMBLE_LENGTH=8",
+            "-DLORAWAN_DEVEUI_AUTO=0",
+            "-DMCU_ESP32_S3"
+        ],
+        "f_cpu": "240000000L",
+        "f_flash": "80000000L",
+        "flash_mode": "qio",
+        "hwids": [
+            [
+                "0x303A",
+                "0x1001"
+            ]
+        ],
+        "mcu": "esp32s3",
+        "variant": "heltec_wireless_tracker"
+    },
+    "connectivity": [
+        "wifi",
+        "bluetooth",
+        "lora",
+        "gps"
+    ],
+    "debug": {
+        "openocd_target": "esp32s3.cfg"
+    },
+    "frameworks": [
+        "espidf"
+    ],
+    "name": "Heltec Wireless Tracker",
+    "upload": {
+        "flash_size": "8MB",
+        "maximum_ram_size": 327680,
+        "maximum_size": 8388608,
+        "require_upload_port": true,
+        "speed": 1036800
+    },
+    "pins": {
+        "USER_SW": {
+            "number": "0",
+            "name": "GPIO0  (User button)"
+        },
+        "RST": {
+            "number": "CHIP_PU",
+            "name": "Chip Reset"
+        },
+        "D_SEL": {
+            "number": "48",
+            "name": "GPIO48 (Display select)"
+        },
+        "BOOT_MODE": {
+            "number": "47",
+            "name": "GPIO47 (Boot-mode strap)"
+        },
+        "GNSS_PPS": {
+            "number": "36",
+            "name": "GPIO36 (GNSS 1 PPS)"
+        },
+        "GNSS_RST": {
+            "number": "35",
+            "name": "GPIO35 (GNSS reset)"
+        },
+        "GNSS_TX": {
+            "number": "33",
+            "name": "GPIO33 (GNSS → MCU RX)"
+        },
+        "GNSS_RX": {
+            "number": "34",
+            "name": "GPIO34 (MCU TX → GNSS)"
+        },
+        "ST7735_CS": {
+            "number": "38",
+            "name": "GPIO38 (CS)"
+        },
+        "ST7735_RST": {
+            "number": "39",
+            "name": "GPIO39 (RST)"
+        },
+        "ST7735_DC": {
+            "number": "40",
+            "name": "GPIO40 (D/C)"
+        },
+        "ST7735_SCLK": {
+            "number": "41",
+            "name": "GPIO41 (SCLK)"
+        },
+        "ST7735_MOSI": {
+            "number": "42",
+            "name": "GPIO42 (MOSI)"
+        },
+        "ST7735_LED_K": {
+            "number": "21",
+            "name": "GPIO21 (Back-light K)"
+        },
+        "ST7735_VTFT_CTRL": {
+            "number": "3",
+            "name": "GPIO3  (VTFT power)"
+        },
+        "OLED_RST": {
+            "number": "21",
+            "name": "GPIO21 (OLED/disp reset)"
+        },
+        "U0_RXD": {
+            "number": "44",
+            "name": "GPIO44 (USB-UART RXD)"
+        },
+        "U0_TXD": {
+            "number": "43",
+            "name": "GPIO43 (USB-UART TXD)"
+        },
+        "USB_D_MINUS": {
+            "number": "19",
+            "name": "GPIO19 (USB D-)"
+        },
+        "USB_D_PLUS": {
+            "number": "20",
+            "name": "GPIO20 (USB D+)"
+        },
+        "LED_WRITE_CTRL": {
+            "number": "18",
+            "name": "GPIO18 (RGB / WS2812)"
+        },
+        "VBAT_READ": {
+            "number": "1",
+            "name": "GPIO1  (Battery ADC)"
+        },
+        "ADC_CTRL": {
+            "number": "2",
+            "name": "GPIO2  (ADC enable)"
+        },
+        "XTAL_32K_N": {
+            "number": "16",
+            "name": "GPIO16 (32 kHz N)"
+        },
+        "XTAL_32K_P": {
+            "number": "15",
+            "name": "GPIO15 (32 kHz P)"
+        },
+        "LORA_DIO1": {
+            "number": "14",
+            "name": "GPIO14 (DIO1)"
+        },
+        "LORA_BUSY": {
+            "number": "13",
+            "name": "GPIO13 (BUSY)"
+        },
+        "LORA_RST": {
+            "number": "12",
+            "name": "GPIO12 (RESET)"
+        },
+        "LORA_MISO": {
+            "number": "11",
+            "name": "GPIO11 (MISO)"
+        },
+        "LORA_MOSI": {
+            "number": "10",
+            "name": "GPIO10 (MOSI)"
+        },
+        "LORA_SCK": {
+            "number": "9",
+            "name": "GPIO9  (SCK)"
+        },
+        "LORA_NSS": {
+            "number": "8",
+            "name": "GPIO8  (NSS/CS)"
+        }
+    },
+    "url": "https://heltec.org/project/wireless-tracker/",
+    "vendor": "Heltec"
+}
