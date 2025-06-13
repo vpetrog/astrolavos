@@ -19,7 +19,6 @@
 #include "freertos/task.h"
 #include <cstring>
 #include <stdint.h>
-#include "utils.hpp"
 
 /* ----------------------- GPIO defaults  ----------------------- */
 constexpr gpio_num_t ST7735_CS_Pin = GPIO_NUM_38;

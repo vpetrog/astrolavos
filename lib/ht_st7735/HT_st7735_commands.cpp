@@ -1,3 +1,14 @@
+/**
+ * @file HT_st7735_commands.cpp
+ * @author Evangelos Petrongonas  (vpetrog@ieee.org)
+ * @brief ST 7355 Initialisation Commands
+ * @version 0.1
+ * @date 2025-06-13
+ *
+ * @copyright Copyright (c) 2025
+ *
+ */
+
 #include "HT_st7735.hpp"
 
 constexpr uint8_t ST7735_NOP = 0x00;

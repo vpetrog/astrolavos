@@ -1,4 +1,14 @@
-/* vim: set ai et ts=4 sw=4: */
+/**
+ * @file HT_st7735_fonts.cpp
+ * @author Evangelos Petrongonas (vpetrog@ieee.org)
+ * @brief ST 7355 Fonts
+ * @version 0.1
+ * @date 2025-06-13
+ *
+ * @copyright Copyright (c) 2025
+ *
+ */
+
 #include "HT_st7735_fonts.hpp"
 
 static const uint16_t Font7x10[] = {
