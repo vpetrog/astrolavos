@@ -21,6 +21,8 @@
 #include <cstring>
 #include <stdint.h>
 
+#pragma once
+
 /* ----------------------- GPIO defaults  ----------------------- */
 constexpr gpio_num_t ST7735_CS_Pin = GPIO_NUM_38;
 constexpr gpio_num_t ST7735_REST_Pin = GPIO_NUM_39;
