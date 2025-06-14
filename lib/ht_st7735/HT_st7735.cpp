@@ -233,3 +233,23 @@ void HT_st7735::set_gamma(uint8_t g)
     data(&g, 1);
     unselect();
 }
+
+void HT_st7735::hold_pins()
+{
+    gpio_hold_en(_cs);
+    gpio_hold_en(_rst);
+    gpio_hold_en(_dc);
+    gpio_hold_en(_led);
+    if (_vtft != GPIO_NUM_NC)
+        gpio_hold_en(_vtft);
+}
+
+void HT_st7735::unhold_pins()
+{
+    gpio_hold_dis(_cs);
+    gpio_hold_dis(_rst);
+    gpio_hold_dis(_dc);
+    gpio_hold_dis(_led);
+    if (_vtft != GPIO_NUM_NC)
+        gpio_hold_dis(_vtft);
+}
