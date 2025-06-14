@@ -185,10 +185,21 @@ void HT_st7735::fill_rectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
         h = _height - y;
     select();
     addr_window(x, y, x + w - 1, y + h - 1);
-    uint8_t c[] = {(uint8_t)(col >> 8), (uint8_t)col};
+    uint32_t pixels = w * h;
+    const uint32_t max_buf = 256;
+    uint8_t buf[max_buf * 2];
+    for (uint32_t i = 0; i < max_buf; ++i)
+    {
+        buf[2 * i] = (uint8_t)(col >> 8);
+        buf[2 * i + 1] = (uint8_t)col;
+    }
     gpio_set_level(_dc, 1);
-    for (uint32_t i = 0; i < w * h; i++)
-        data(c, 2);
+    while (pixels)
+    {
+        uint32_t chunk = (pixels > max_buf) ? max_buf : pixels;
+        data(buf, chunk * 2);
+        pixels -= chunk;
+    }
     unselect();
 }
 
