@@ -24,6 +24,7 @@ extern "C" void app_main()
     utils::delay_ms(1000);
     HT_st7735 display;
     display.init();
+    display.set_backlight(10);
     display.fill_screen(ST7735_BLACK);
     xTaskCreate(gnss_task, "gnss_task", 4096, &display, 5, NULL);
     while (true)

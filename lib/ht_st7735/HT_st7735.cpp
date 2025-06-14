@@ -54,6 +54,27 @@ esp_err_t HT_st7735::init()
     exec_cmd_list(init_cmds2);
     exec_cmd_list(init_cmds3);
     unselect();
+
+    // --- add just after gpio_set_level(_led, 1);
+    ledc_timer_config_t tcfg = {
+        .speed_mode = LEDC_MODE,
+        .duty_resolution = LEDC_TIMER_10_BIT,
+        .timer_num = LEDC_TIMER,
+        .freq_hz = LEDC_FREQ_HZ,
+        .clk_cfg = LEDC_USE_RC_FAST_CLK,
+    };
+    ESP_ERROR_CHECK(ledc_timer_config(&tcfg));
+
+    ledc_channel_config_t ccfg = {.gpio_num = _led,
+                                  .speed_mode = LEDC_MODE,
+                                  .channel = LEDC_CH,
+                                  .timer_sel = LEDC_TIMER,
+                                  .duty = (1 << LEDC_RES_BITS) -
+                                          1, // 100 % on start-up
+                                  .hpoint = 0,
+                                  .sleep_mode = LEDC_SLEEP_MODE_KEEP_ALIVE};
+    ESP_ERROR_CHECK(ledc_channel_config(&ccfg));
+
     ESP_LOGI(TAG, "ST7735 initialised (%ux%u)", _width, _height);
     return ESP_OK;
 }
@@ -236,20 +257,29 @@ void HT_st7735::set_gamma(uint8_t g)
 
 void HT_st7735::hold_pins()
 {
+    /* The _led pin is not configured as it managed by the ledc*/
     gpio_hold_en(_cs);
     gpio_hold_en(_rst);
     gpio_hold_en(_dc);
-    gpio_hold_en(_led);
     if (_vtft != GPIO_NUM_NC)
         gpio_hold_en(_vtft);
 }
 
 void HT_st7735::unhold_pins()
 {
+    /* The _led pin is not configured as it managed by the ledc*/
     gpio_hold_dis(_cs);
     gpio_hold_dis(_rst);
     gpio_hold_dis(_dc);
-    gpio_hold_dis(_led);
     if (_vtft != GPIO_NUM_NC)
         gpio_hold_dis(_vtft);
+}
+
+void HT_st7735::set_backlight(uint8_t percent)
+{
+    if (percent > 100)
+        percent = 100;
+    uint32_t duty = ((uint32_t)percent * ((1 << LEDC_RES_BITS) - 1)) / 100;
+    ledc_set_duty(LEDC_MODE, LEDC_CH, duty);
+    ledc_update_duty(LEDC_MODE, LEDC_CH);
 }

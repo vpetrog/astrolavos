@@ -13,6 +13,7 @@
 
 #include "HT_st7735_fonts.hpp"
 #include "driver/gpio.h"
+#include "driver/ledc.h"
 #include "driver/spi_master.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
@@ -104,6 +105,8 @@ public:
     void set_gamma(uint8_t gamma);
     void hold_pins(void);
     void unhold_pins(void);
+    void set_backlight(const uint8_t percent);
+    void hold_backlight(bool enable = true);
 
 private:
     /* SPI helpers */
@@ -118,4 +121,9 @@ private:
     gpio_num_t _cs, _rst, _dc, _sclk, _mosi, _led, _vtft;
     spi_device_handle_t _spi;
     uint16_t _width, _height, _x_start, _y_start;
+    static constexpr ledc_mode_t LEDC_MODE = LEDC_LOW_SPEED_MODE;
+    static constexpr ledc_timer_t LEDC_TIMER = LEDC_TIMER_0;
+    static constexpr ledc_channel_t LEDC_CH = LEDC_CHANNEL_0;
+    static constexpr uint32_t LEDC_FREQ_HZ = 1000;
+    static constexpr uint32_t LEDC_RES_BITS = 10;
 };
