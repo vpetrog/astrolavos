@@ -102,6 +102,8 @@ public:
                     const uint16_t* d);
     void invert_colors(bool inv);
     void set_gamma(uint8_t gamma);
+    void hold_pins(void);
+    void unhold_pins(void);
 
 private:
     /* SPI helpers */
