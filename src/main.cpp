@@ -19,6 +19,7 @@
 #include <gnss.hpp>
 #include <pins.hpp>
 #include <utils.hpp>
+#include <lora.hpp>
 
 static const char* TAG = "main";
 
@@ -60,10 +61,11 @@ extern "C" void app_main()
 
     ESP_ERROR_CHECK(esp_pm_configure(&pm_config));
 
-    xTaskCreate(gnss_task, "gnss_task", 4096, &display, 5, NULL);
-    xTaskCreate(battery_task, "battery_task", 4096, &display, 2, NULL);
-    xTaskCreate(blinking_task, "blinking_task", 4096, &display, 3, NULL);
-    xTaskCreate(heading_task, "heading_task", 4096, &display, 4, NULL);
+    // xTaskCreate(gnss_task, "gnss_task", 4096, &display, 5, NULL);
+    // xTaskCreate(battery_task, "battery_task", 4096, &display, 2, NULL);
+    // xTaskCreate(blinking_task, "blinking_task", 4096, &display, 3, NULL);
+    // xTaskCreate(heading_task, "heading_task", 4096, &display, 4, NULL);
+    xTaskCreate(lora_task, "lora_task", 4096, &display, 5, NULL);
 
     vTaskSuspend(NULL);
 }

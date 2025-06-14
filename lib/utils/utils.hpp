@@ -10,8 +10,11 @@
  */
 #include "freertos/FreeRTOS.h"
 
+#define max(a, b) (((a) > (b)) ? (a) : (b))
+
 namespace utils
 {
 /* -----------------------------  Helper macros ----------------------------- */
 static inline void delay_ms(uint32_t ms) { vTaskDelay(pdMS_TO_TICKS(ms)); }
+static inline void delay_us(uint32_t us) { vTaskDelay(max(pdMS_TO_TICKS(us) / 1000, 1)); }
 }
