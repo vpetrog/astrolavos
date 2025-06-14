@@ -128,4 +128,5 @@ private:
     static constexpr ledc_channel_t LEDC_CH = LEDC_CHANNEL_0;
     static constexpr uint32_t LEDC_FREQ_HZ = 1000;
     static constexpr uint32_t LEDC_RES_BITS = 10;
+    SemaphoreHandle_t _mutex = nullptr;
 };

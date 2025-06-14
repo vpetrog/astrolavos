@@ -22,6 +22,7 @@ static const char* TAG = "st7735";
 
 esp_err_t HT_st7735::init()
 {
+    _mutex = xSemaphoreCreateMutex();
     gpio_config_t io = {};
     io.mode = GPIO_MODE_OUTPUT;
     io.pin_bit_mask =
@@ -110,6 +111,7 @@ inline void HT_st7735::data(const uint8_t* d, size_t len)
 
 void HT_st7735::exec_cmd_list(const uint8_t* a)
 {
+    xSemaphoreTake(_mutex, portMAX_DELAY);
     uint8_t nCmd = *a++;
     while (nCmd--)
     {
@@ -128,6 +130,7 @@ void HT_st7735::exec_cmd_list(const uint8_t* a)
             utils::delay_ms(ms);
         }
     }
+    xSemaphoreGive(_mutex);
 }
 
 void HT_st7735::addr_window(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
@@ -145,6 +148,7 @@ void HT_st7735::addr_window(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1)
 
 void HT_st7735::draw_pixel(uint16_t x, uint16_t y, uint16_t col)
 {
+    xSemaphoreTake(_mutex, portMAX_DELAY);
     if (x >= _width || y >= _height)
         return;
     select();
@@ -152,6 +156,7 @@ void HT_st7735::draw_pixel(uint16_t x, uint16_t y, uint16_t col)
     uint8_t d[] = {(uint8_t)(col >> 8), (uint8_t)col};
     data(d, 2);
     unselect();
+    xSemaphoreGive(_mutex);
 }
 
 void HT_st7735::write_char(uint16_t x, uint16_t y, char ch, FontDef f,
@@ -173,6 +178,7 @@ void HT_st7735::write_char(uint16_t x, uint16_t y, char ch, FontDef f,
 void HT_st7735::write_str(uint16_t x, uint16_t y, const char* s, FontDef f,
                           uint16_t col, uint16_t bg)
 {
+    xSemaphoreTake(_mutex, portMAX_DELAY);
     select();
     uint16_t orig_x = x;
     while (*s)
@@ -198,6 +204,7 @@ void HT_st7735::write_str(uint16_t x, uint16_t y, const char* s, FontDef f,
         ++s;
     }
     unselect();
+    xSemaphoreGive(_mutex);
 }
 
 void HT_st7735::fill_rectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
@@ -209,6 +216,7 @@ void HT_st7735::fill_rectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
         w = _width - x;
     if (y + h - 1 >= _height)
         h = _height - y;
+    xSemaphoreTake(_mutex, portMAX_DELAY);
     select();
     addr_window(x, y, x + w - 1, y + h - 1);
     uint32_t pixels = w * h;
@@ -227,11 +235,13 @@ void HT_st7735::fill_rectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
         pixels -= chunk;
     }
     unselect();
+    xSemaphoreGive(_mutex);
 }
 
 void HT_st7735::draw_image(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
                            const uint16_t* img)
 {
+    xSemaphoreTake(_mutex, portMAX_DELAY);
     if (x >= _width || y >= _height || x + w - 1 >= _width ||
         y + h - 1 >= _height)
         return;
@@ -239,20 +249,25 @@ void HT_st7735::draw_image(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
     addr_window(x, y, x + w - 1, y + h - 1);
     data(reinterpret_cast<const uint8_t*>(img), w * h * 2);
     unselect();
+    xSemaphoreGive(_mutex);
 }
 
 void HT_st7735::invert_colors(bool inv)
 {
+    xSemaphoreTake(_mutex, portMAX_DELAY);
     select();
     cmd(inv ? 0x21 /*INVON*/ : 0x20 /*INVOFF*/);
     unselect();
+    xSemaphoreGive(_mutex);
 }
 void HT_st7735::set_gamma(uint8_t g)
 {
+    xSemaphoreTake(_mutex, portMAX_DELAY);
     select();
     cmd(0x26 /*GAMSET*/);
     data(&g, 1);
     unselect();
+    xSemaphoreGive(_mutex);
 }
 
 void HT_st7735::hold_pins()
