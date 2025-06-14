@@ -153,19 +153,24 @@ void HT_st7735::write_str(uint16_t x, uint16_t y, const char* s, FontDef f,
                           uint16_t col, uint16_t bg)
 {
     select();
+    uint16_t orig_x = x;
     while (*s)
     {
-        if (x + f.width >= _width)
+        if (*s == '\n')
         {
-            x = 0;
+            x = orig_x;
             y += f.height;
-            if (y + f.height >= _height)
+            ++s;
+            if (y + f.height > _height)
                 break;
-            if (*s == ' ')
-            {
-                ++s;
-                continue;
-            }
+            continue;
+        }
+        if (x + f.width > _width)
+        {
+            x = orig_x;
+            y += f.height;
+            if (y + f.height > _height)
+                break;
         }
         write_char(x, y, *s, f, col, bg);
         x += f.width;
