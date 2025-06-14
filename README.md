@@ -1,9 +1,13 @@
-# Astrolavos
+![Astrolavos Logo](assets/Astrolavos.svg)
 
 A Festival Friend Finder based on [Heltec Wireless Tracker](https://heltec.org/project/wireless-tracker/)
+Astrolavos (*Ancient Greek: ἀστρολάβος*) is an astronomical instrument dating to the ancient time and served as a chart for the stars.
+You and your friends are unique stars in the festival sky, and Astrolavos will help you find each other (#cringe)
+
+
 
 ## 1. Introduction
-The project aims to be an OS Festival Friend Finder. The tracker will show the deirection and distance of the other paired trackers. The devices are connected to each other via LORA.
+The project aims to be an OS Festival Friend Finder. The tracker will show the direction and distance of the other paired trackers. The devices are connected to each other via LORA.
 
 ## 2. Tenets
 - **Open Source** Free for anyone to use with their friend
@@ -30,20 +34,21 @@ The project is in very, very, very alpha and under heavy development. Expect fun
 ### 4.3 Status and Next Plan
 - Dev Enviroment Setup and Board Definitions ✅
 - Basic TFT Library Driver ✅
-- GNSS Driver 🚧
-- LORA Driver 🔜
-- Gyroscope/Accelerometer Driver 🔜
-- Integration and main usage 🔜
+- GNSS Driver ✅
+- LORA Driver 🚧
+- Gyroscope/Accelerometer Driver 🚧
+- Integration and Main App 🔜
 
 ------------------ 🚀 MVP 🚀 -------------------
 
 - *Stretch Goal* Power Optimisation 🎯
 - *Stretch Goal* Battery Monitoring 🎯
+- *Stretch Goal* Isolation Mode 🎯
 
 ------------------  Future Plans  -------------------
 
 - Menu ✨
-- Pairing without a Code ✨
+- Pairing without Code ✨
 - Better Visuals, Integration with [lvgl](https://lvgl.io/)
 
 ### 5. Contributing
