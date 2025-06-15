@@ -21,6 +21,8 @@
 
 static const char* TAG = "main";
 
+constexpr size_t BLINKING_TASK_SLEEP = 3500;
+
 void blinking_task(void* args)
 {
     gpio_set_direction(heltec::PIN_LED_WRITE_CTRL, GPIO_MODE_OUTPUT);
@@ -32,12 +34,12 @@ void blinking_task(void* args)
         gpio_set_level(heltec::PIN_LED_WRITE_CTRL, 1);
         gpio_hold_en(heltec::PIN_LED_WRITE_CTRL);
 
-        utils::delay_ms(3500);
+        utils::delay_ms(BLINKING_TASK_SLEEP);
 
         gpio_hold_dis(heltec::PIN_LED_WRITE_CTRL);
         gpio_set_level(heltec::PIN_LED_WRITE_CTRL, 0);
         gpio_hold_en(heltec::PIN_LED_WRITE_CTRL);
-        utils::delay_ms(3500);
+        utils::delay_ms(BLINKING_TASK_SLEEP);
     }
 }
 

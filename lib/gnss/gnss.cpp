@@ -25,7 +25,10 @@ static const char* TAG = "GNSS";
 TinyGPSPlus gps;
 
 const size_t BUF_SIZE = 1024;
-constexpr size_t GNSS_TASK_SLEEP_TIMER = 30 * 1000000ULL;
+constexpr size_t GNSS_TASK_LOCATED_SLEEP = 15 * 1000;
+constexpr size_t GNSS_TASK_SCANNING_SLEEP = 1 * 1000;
+constexpr size_t GNSS_POWER_UP_SLEEP = 3 * 1000;
+
 
 void gnss_power_up()
 {
@@ -62,7 +65,7 @@ void gnss_task(void* args)
     {
         esp_pm_lock_acquire(lock);
         gnss_power_up();
-        utils::delay_ms(3000);
+        utils::delay_ms(GNSS_POWER_UP_SLEEP);
         int len =
             uart_read_bytes(UART_NUM_1, data, BUF_SIZE, pdMS_TO_TICKS(100));
 
@@ -85,7 +88,7 @@ void gnss_task(void* args)
             gnss_power_down();
             display->hold_pins();
             esp_pm_lock_release(lock);
-            utils::delay_ms(15000);
+            utils::delay_ms(GNSS_TASK_LOCATED_SLEEP);
         }
         else
         {
@@ -93,10 +96,10 @@ void gnss_task(void* args)
             display->fill_rectangle(0, 0, 180, 28, ST7735_BLACK);
             display->write_str(0, 0, "Waiting for GNSS Data", Font_7x10,
                                ST7735_WHITE, ST7735_BLACK);
-            ESP_LOGI(TAG, "Waiting for GPS data... %d bytes", len);
+            ESP_LOGI(TAG, "Waiting for GNSS data... %d bytes", len);
             display->hold_pins();
             esp_pm_lock_release(lock);
-            utils::delay_ms(1000);
+            utils::delay_ms(GNSS_TASK_SCANNING_SLEEP);
         }
     }
 }
