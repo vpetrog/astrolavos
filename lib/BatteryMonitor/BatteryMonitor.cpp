@@ -82,7 +82,7 @@ BatteryMonitor::BatteryMonitor(adc_channel_t channel)
 
     /* configure the specific channel (GPIO 1  → ADC1_CH0) */
     adc_oneshot_chan_cfg_t chan_cfg{
-        .atten = ADC_ATTEN_DB_11,
+        .atten = ADC_ATTEN_DB_12,
         .bitwidth = ADC_BITWIDTH_12 // 12-bit on ESP32-S3
     };
     ESP_ERROR_CHECK(adc_oneshot_config_channel(_adc, _channel, &chan_cfg));
