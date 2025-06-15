@@ -10,7 +10,14 @@
  */
 #include "QMC5883L.hpp"
 #include "esp_log.h"
+#include "esp_pm.h"
+#include <HT_st7735.hpp>
 #include <math.h>
+#include <utils.hpp>
+
+constexpr size_t HEADING_TASK_SLEEP = 7 * 1000;
+
+constexpr const char* TAG = "QMC5883L";
 
 constexpr uint8_t QMC5883L_REG_CTRL1 = 0x09;
 constexpr uint8_t QMC5883L_REG_DATA = 0x00;
@@ -82,4 +89,49 @@ float QMC5883L::get_heading()
     if (angle < 0)
         angle += 360.0;
     return angle;
+}
+
+void heading_task(void* args)
+{
+    esp_pm_lock_handle_t lock;
+    esp_pm_lock_create(ESP_PM_CPU_FREQ_MAX, 0, "heading_lock", &lock);
+    esp_pm_lock_acquire(lock);
+    HT_st7735* display = static_cast<HT_st7735*>(args);
+    QMC5883L qmc5883l;
+    int Y = 4 * Font_7x10.height;
+
+    if (qmc5883l.init() != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to initialize QMC5883L");
+    }
+    char buf[9];
+
+    int16_t x, y, z;
+    esp_pm_lock_release(lock);
+    while (true)
+    {
+        esp_pm_lock_acquire(lock);
+        if (qmc5883l.read_raw(x, y, z) == ESP_OK)
+        {
+            uint16_t heading = qmc5883l.get_heading();
+            ESP_LOGI(TAG, "Heading: %u", heading);
+            display->unhold_pins();
+            display->fill_rectangle(0, Y, 180, Y + Font_7x10.height,
+                                    ST7735_BLACK);
+            display->hold_pins();
+            snprintf(buf, sizeof(buf), "%udeg", heading);
+            display->write_str(0, Y, buf, Font_7x10, ST7735_WHITE,
+                               ST7735_BLACK);
+        }
+        else
+        {
+            ESP_LOGE(TAG, "Failed to read data");
+            display->unhold_pins();
+            display->write_str(0, Y, "Mag Failed", Font_7x10, ST7735_WHITE,
+                               ST7735_BLACK);
+            display->hold_pins();
+        }
+        esp_pm_lock_release(lock);
+        utils::delay_ms(HEADING_TASK_SLEEP); // Adjust delay as needed
+    }
 }

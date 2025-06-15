@@ -15,6 +15,7 @@
 #include "freertos/task.h"
 #include <BatteryMonitor.hpp>
 #include <HT_st7735.hpp>
+#include <QMC5883L.hpp>
 #include <gnss.hpp>
 #include <pins.hpp>
 #include <utils.hpp>
@@ -62,7 +63,7 @@ extern "C" void app_main()
     xTaskCreate(gnss_task, "gnss_task", 4096, &display, 5, NULL);
     xTaskCreate(battery_task, "battery_task", 4096, &display, 2, NULL);
     xTaskCreate(blinking_task, "blinking_task", 4096, &display, 3, NULL);
-
+    xTaskCreate(heading_task, "heading_task", 4096, &display, 4, NULL);
 
     vTaskSuspend(NULL);
 }
