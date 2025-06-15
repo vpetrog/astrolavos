@@ -1,0 +1,90 @@
+/**
+ * @file Astrolavos_types.hpp
+ * @author Evangelos Petrongonas (vpetrog@ieee.org)
+ * @brief Types and constants for the Astrolavos shared memory
+ * @version 0.1
+ * @date 2025-06-15
+ *
+ * @copyright Copyright (c) 2025
+ *
+ */
+
+#pragma once
+
+#include <cstdint>
+
+namespace astrolavos
+{
+
+constexpr int ID_ASTROLAVOS_NOT_INITIALIZED =
+    -1; /* Astrolavos not initialized */
+
+constexpr uint8_t BATTERY_STATUS_UNKNOWN = 0xff; /* Battery status unknown */
+
+typedef struct
+{
+    uint8_t
+        percentage; /* Battery percentage (0-100) or BATTERY_STATUS_UNKNOWN */
+    int64_t ts;     /* Timestamp of the last update in usec */
+} battery_status_t;
+
+constexpr uint8_t GNSS_NO_SATELLITES = 0xFF; /* No satellites in view */
+
+constexpr uint8_t GNSS_MAX_SATELLITES =
+    96; /* Max Number of Satellites according to UC650 datasheet */
+
+typedef struct
+{
+    uint8_t num_satellites; /* Number of satellites in view or
+                               GNSS_NO_SATELLITES if no signal is received */
+    int64_t ts;             /* Timestamp of the last update in usec */
+
+} gnss_status_t;
+
+typedef enum
+{
+    MAGNETOMETER_HEALTHY = 0,      /* Magnetometer healthy */
+    MAGNETOMETER_ERROR = 1,        /* Magnetometer error */
+    MAGNETOMETER_UNINITIALIZED = 2 /* Magnetometer not initialized */
+} magnetometer_health_t;
+
+typedef struct
+{
+    magnetometer_health_t status; /* Magnetometer status */
+    int64_t ts;                   /* Timestamp of the last update in usec */
+} magnetometer_status_t;
+
+/* TODO: Add LoRa related health monitoring*/
+
+typedef struct
+{
+    battery_status_t battery;           /* Battery status */
+    gnss_status_t gnss;                 /* GNSS status */
+    magnetometer_status_t magnetometer; /* Magnetometer status */
+    int64_t ts; /* Timestamp of the last update in usec */
+    /* TODO: Add LoRa Status */
+} health_status_t;
+
+typedef struct
+{
+    double latitude;  /* Latitude in degrees or NaN if not available */
+    double longitude; /* Longitude in degrees or NaN if not available */
+    int64_t ts;       /* Timestamp of the last update in usec */
+} gnss_location_t;
+
+typedef struct
+{
+    float heading; /* Heading in degrees (0-360)  or Nan If not available */
+    int64_t ts;    /* Timestamp of the last update in usec */
+} heading_t;
+
+typedef struct
+{
+    int id;
+    const char name[6];
+    uint16_t colour;
+} paired_device_auto_config_t;
+
+/* TODO: Any LoRa Related Structs */
+
+} // namespace astrolavos
