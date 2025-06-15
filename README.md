@@ -17,7 +17,7 @@ The project aims to be an OS Festival Friend Finder. The tracker will show the d
 
 ## 2. Bill of Materials
 - [Heltec Wireless Tracker](https://heltec.org/project/wireless-tracker/)
-- [GY-521 MPU-6050 3-axis gyroscope and acceleration sensor](https://www.az-delivery.de/en/products/gy-521-6-achsen-gyroskop-und-beschleunigungssensor)
+- [GY-271 Magnetometer](https://www.az-delivery.de/en/products/gy-271-kompassmodul-kompass-magnet-sensor-fuer-arduino-und-raspberry-pi?variant=18912984432736)
 - Any 3000mAh  LiPO 1S/1C with JST 1.25 Connector [like this one](https://www.amazon.de/-/en/dp/B0F18ST3K5?ref=ppx_yo2ov_dt_b_fed_asin_title)
 
 ## 3. Schematics
@@ -36,13 +36,14 @@ The project is in very, very, very alpha and under heavy development. Expect fun
 - Basic TFT Library Driver ✅
 - GNSS Driver ✅
 - LORA Driver 🚧
-- Gyroscope/Accelerometer Driver 🚧
-- Integration and Main App 🔜
+- Magnetometer Driver ✅
+- Integration and Main App 🚧
 
 ------------------ 🚀 MVP 🚀 -------------------
 
-- *Stretch Goal* Power Optimisation 🎯
-- *Stretch Goal* Battery Monitoring 🎯
+- *Stretch Goal* Power Optimisation 🚧
+- *Stretch Goal* Battery Monitoring ✅
+- *Stretch Goal* Staleness Detections and Data Freshness 🎯
 - *Stretch Goal* Isolation Mode 🎯
 
 ------------------  Future Plans  -------------------
