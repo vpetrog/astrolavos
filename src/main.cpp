@@ -12,6 +12,7 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include <BatteryMonitor.hpp>
 #include <pins.hpp>
 #include <utils.hpp>
 #include <HT_st7735.hpp>
@@ -27,7 +28,7 @@ extern "C" void app_main()
     display.set_backlight(10);
     display.fill_screen(ST7735_BLACK);
     xTaskCreate(gnss_task, "gnss_task", 4096, &display, 5, NULL);
-    while (true)
-        utils::delay_ms(5000); // keep the main task alive
+    xTaskCreate(battery_task, "battery_task", 4096, &display, 2, NULL);
     
+    vTaskSuspend(NULL);
 }
