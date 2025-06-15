@@ -10,6 +10,7 @@
  */
 #include "driver/gpio.h"
 #include "esp_log.h"
+#include "esp_pm.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <BatteryMonitor.hpp>
@@ -27,6 +28,15 @@ extern "C" void app_main()
     display.init();
     display.set_backlight(10);
     display.fill_screen(ST7735_BLACK);
+
+    esp_pm_config_t pm_config = {
+        .max_freq_mhz = 240,
+        .min_freq_mhz = 10,
+        .light_sleep_enable = true,
+    };
+
+    ESP_ERROR_CHECK(esp_pm_configure(&pm_config));
+
     xTaskCreate(gnss_task, "gnss_task", 4096, &display, 5, NULL);
     xTaskCreate(battery_task, "battery_task", 4096, &display, 2, NULL);
     
