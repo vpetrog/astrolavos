@@ -10,6 +10,7 @@
  */
 
 #include "driver/gpio.h"
+#include "esp_pm.h"
 #include <BatteryMonitor.hpp>
 #include <pins.hpp>
 #include <utils.hpp>
@@ -122,19 +123,29 @@ void battery_task(void* args)
     BatteryMonitor monitor;
     HT_st7735* display = reinterpret_cast<HT_st7735*>(args);
     ESP_LOGI(TAG, "Battery Monitor Task started");
+    esp_pm_lock_handle_t lock;
+    esp_pm_lock_create(ESP_PM_CPU_FREQ_MAX, 0, "battery_lock", &lock);
+    display->fill_rectangle(0, 0, 160, 80, ST7735_BLACK);
 
     while (true)
     {
-        gpio_set_level(heltec::PIN_ADC_CTRL, 1); /* Enable ADC Vdiv*/
-
+        esp_pm_lock_acquire(lock);
+        gpio_hold_dis(heltec::PIN_ADC_CTRL);
+        gpio_set_level(heltec::PIN_ADC_CTRL, 1);
+        gpio_hold_en(heltec::PIN_ADC_CTRL);
+    
         int raw = monitor.get_raw();
         float voltage = monitor.get_voltage(raw);
-        /* output the voltage to the display */
+    
+        display->unhold_pins();
         monitor.output_voltage(display, voltage);
-        gpio_set_level(heltec::PIN_ADC_CTRL, 0); /* Disable ADC Vdiv*/
+        gpio_hold_dis(heltec::PIN_ADC_CTRL);
+        gpio_set_level(heltec::PIN_ADC_CTRL, 0);
+        gpio_hold_en(heltec::PIN_ADC_CTRL);
+        display->hold_pins();
 
         ESP_LOGI(TAG, "Battery Voltage: %.2f V Raw=%d", voltage, raw);
-
+        esp_pm_lock_release(lock);
         utils::delay_ms(10000);
     }
 }

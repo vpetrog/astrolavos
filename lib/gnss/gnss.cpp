@@ -12,6 +12,7 @@
 #include "TinyGPS++.hpp"
 #include "driver/uart.h"
 #include "esp_log.h"
+#include "esp_pm.h"
 #include "esp_sleep.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -19,7 +20,6 @@
 #include <gnss.hpp>
 #include <pins.hpp>
 #include <utils.hpp>
-
 static const char* TAG = "GNSS";
 
 TinyGPSPlus gps;
@@ -41,6 +41,9 @@ void gnss_power_down()
 
 void gnss_task(void* args)
 {
+    esp_pm_lock_handle_t lock;
+    esp_pm_lock_create(ESP_PM_CPU_FREQ_MAX, 0, "gnss_lock", &lock);
+    esp_pm_lock_acquire(lock);
     utils::delay_ms(1000);
     HT_st7735* display = reinterpret_cast<HT_st7735*>(args);
 
@@ -54,8 +57,10 @@ void gnss_task(void* args)
     uart_driver_install(UART_NUM_1, BUF_SIZE * 2, 0, 8, nullptr, 0);
 
     uint8_t data[BUF_SIZE];
+    esp_pm_lock_release(lock);
     while (true)
     {
+        esp_pm_lock_acquire(lock);
         gnss_power_up();
         utils::delay_ms(3000);
         int len =
@@ -73,23 +78,25 @@ void gnss_task(void* args)
                      gps.location.lng());
 
             ESP_LOGI(TAG, "%s", buffer);
-
+            display->unhold_pins();
             display->fill_rectangle(0, 0, 180, 28, ST7735_BLACK);
             display->write_str(0, 0, buffer, Font_7x10, ST7735_WHITE,
                                ST7735_BLACK);
             gnss_power_down();
             display->hold_pins();
-            esp_sleep_enable_timer_wakeup(GNSS_TASK_SLEEP_TIMER);
-            esp_light_sleep_start();
+            esp_pm_lock_release(lock);
+            utils::delay_ms(15000);
         }
         else
         {
+            display->unhold_pins();
             display->fill_rectangle(0, 0, 180, 28, ST7735_BLACK);
             display->write_str(0, 0, "Waiting for GNSS Data", Font_7x10,
                                ST7735_WHITE, ST7735_BLACK);
             ESP_LOGI(TAG, "Waiting for GPS data... %d bytes", len);
+            display->hold_pins();
+            esp_pm_lock_release(lock);
+            utils::delay_ms(1000);
         }
-
-        utils::delay_ms(1000);
     }
 }
