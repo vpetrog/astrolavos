@@ -32,3 +32,5 @@ private:
     esp_err_t write_reg(uint8_t reg, uint8_t val);
     esp_err_t read_bytes(uint8_t reg, uint8_t* data, size_t len);
 };
+
+void heading_task(void* args);
