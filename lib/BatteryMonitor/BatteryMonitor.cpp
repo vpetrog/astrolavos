@@ -16,7 +16,7 @@
 #include <utils.hpp>
 
 static const char* TAG = "BatteryMon";
-static constexpr size_t BATTERY_TASK_SLEEP_TIMER = 5 * 60 * 1000; // 5 minutes
+static constexpr size_t BATTERY_TASK_SLEEP = 1 * 60 * 1000; // 1 minute
 
 /* By defining the levels like this, we are avoiding the use of  floats and
  * runtime in the code. Every little piece of saved energy matter */
@@ -146,6 +146,6 @@ void battery_task(void* args)
 
         ESP_LOGI(TAG, "Battery Voltage: %.2f V Raw=%d", voltage, raw);
         esp_pm_lock_release(lock);
-        utils::delay_ms(10000);
+        utils::delay_ms(BATTERY_TASK_SLEEP);
     }
 }
