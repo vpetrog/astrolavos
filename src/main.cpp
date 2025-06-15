@@ -14,12 +14,32 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <BatteryMonitor.hpp>
-#include <pins.hpp>
-#include <utils.hpp>
 #include <HT_st7735.hpp>
 #include <gnss.hpp>
+#include <pins.hpp>
+#include <utils.hpp>
 
 static const char* TAG = "main";
+
+void blinking_task(void* args)
+{
+    gpio_set_direction(heltec::PIN_LED_WRITE_CTRL, GPIO_MODE_OUTPUT);
+    ESP_LOGI(TAG, "Blinking Task started");
+    while (true)
+    {
+        ESP_LOGI(TAG, "Blinking");
+        gpio_hold_dis(heltec::PIN_LED_WRITE_CTRL);
+        gpio_set_level(heltec::PIN_LED_WRITE_CTRL, 1);
+        gpio_hold_en(heltec::PIN_LED_WRITE_CTRL);
+
+        utils::delay_ms(3500);
+
+        gpio_hold_dis(heltec::PIN_LED_WRITE_CTRL);
+        gpio_set_level(heltec::PIN_LED_WRITE_CTRL, 0);
+        gpio_hold_en(heltec::PIN_LED_WRITE_CTRL);
+        utils::delay_ms(3500);
+    }
+}
 
 extern "C" void app_main()
 {
@@ -39,6 +59,8 @@ extern "C" void app_main()
 
     xTaskCreate(gnss_task, "gnss_task", 4096, &display, 5, NULL);
     xTaskCreate(battery_task, "battery_task", 4096, &display, 2, NULL);
-    
+    xTaskCreate(blinking_task, "blinking_task", 4096, &display, 3, NULL);
+
+
     vTaskSuspend(NULL);
 }
