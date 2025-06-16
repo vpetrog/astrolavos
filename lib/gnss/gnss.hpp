@@ -12,3 +12,4 @@
 #pragma once
 
 void gnss_task(void* args);
+void gnss_astrolavos_task(void* args);

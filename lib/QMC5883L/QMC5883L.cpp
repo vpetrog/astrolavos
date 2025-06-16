@@ -11,6 +11,7 @@
 #include "QMC5883L.hpp"
 #include "esp_log.h"
 #include "esp_pm.h"
+#include <Astrolavos.hpp>
 #include <HT_st7735.hpp>
 #include <math.h>
 #include <utils.hpp>
@@ -130,6 +131,48 @@ void heading_task(void* args)
             display->write_str(0, Y, "Mag Failed", Font_7x10, ST7735_WHITE,
                                ST7735_BLACK);
             display->hold_pins();
+        }
+        esp_pm_lock_release(lock);
+        utils::delay_ms(HEADING_TASK_SLEEP); // Adjust delay as needed
+    }
+}
+
+void heading_astrolavos_task(void* args)
+{
+    esp_pm_lock_handle_t lock;
+    esp_pm_lock_create(ESP_PM_CPU_FREQ_MAX, 0, "heading_lock", &lock);
+    esp_pm_lock_acquire(lock);
+    astrolavos::Astrolavos* astrolavos_app =
+        reinterpret_cast<astrolavos::Astrolavos*>(args);
+    QMC5883L qmc5883l;
+
+    if (qmc5883l.init() != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to initialize QMC5883L");
+        astrolavos_app->updateHealthMagnetometer(
+            astrolavos::magnetometer_health_t::MAGNETOMETER_UNINITIALIZED);
+        esp_pm_lock_release(lock);
+        vTaskSuspend(nullptr);
+    }
+
+    int16_t x, y, z;
+    esp_pm_lock_release(lock);
+    while (true)
+    {
+        esp_pm_lock_acquire(lock);
+        if (qmc5883l.read_raw(x, y, z) == ESP_OK)
+        {
+            uint16_t heading = qmc5883l.get_heading();
+            ESP_LOGI(TAG, "Heading: %u", heading);
+            astrolavos_app->updateHeading(heading);
+            astrolavos_app->updateHealthMagnetometer(
+                astrolavos::magnetometer_health_t::MAGNETOMETER_HEALTHY);
+        }
+        else
+        {
+            ESP_LOGE(TAG, "Failed to read data");
+            astrolavos_app->updateHealthMagnetometer(
+                astrolavos::magnetometer_health_t::MAGNETOMETER_ERROR);
         }
         esp_pm_lock_release(lock);
         utils::delay_ms(HEADING_TASK_SLEEP); // Adjust delay as needed

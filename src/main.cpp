@@ -13,6 +13,7 @@
 #include "esp_pm.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include <Astrolavos.hpp>
 #include <BatteryMonitor.hpp>
 #include <HT_st7735.hpp>
 #include <QMC5883L.hpp>
@@ -44,6 +45,7 @@ void blinking_task(void* args)
     }
 }
 
+#if 0
 extern "C" void app_main()
 {
     utils::delay_ms(1000);
@@ -67,3 +69,34 @@ extern "C" void app_main()
 
     vTaskSuspend(NULL);
 }
+#else
+extern "C" void app_main()
+{
+    HT_st7735 display;
+    astrolavos::Astrolavos astrolavos_app;
+    display.init();
+    display.set_backlight(10);
+    esp_pm_config_t pm_config = {
+        .max_freq_mhz = 240,
+        .min_freq_mhz = 10,
+        .light_sleep_enable = true,
+    };
+
+    ESP_ERROR_CHECK(esp_pm_configure(&pm_config));
+
+    astrolavos::astrolavos_args_t task_args = {
+        .display = &display,
+        .app = &astrolavos_app,
+    };
+    xTaskCreate(astrolavos_task, "astrolavos_task", 4096, &task_args, 5, NULL);
+    xTaskCreate(gnss_astrolavos_task, "gnss_task", 4096, &astrolavos_app, 4,
+                NULL);
+    xTaskCreate(battery_astrolavos_task, "battery_task", 4096, &astrolavos_app,
+                2, NULL);
+    xTaskCreate(blinking_task, "blinking_task", 4096, nullptr, 3, NULL);
+    xTaskCreate(heading_astrolavos_task, "heading_task", 4096, &astrolavos_app,
+                4, NULL);
+
+    vTaskSuspend(NULL);
+}
+#endif
