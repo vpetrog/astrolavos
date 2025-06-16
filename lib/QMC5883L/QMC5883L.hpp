@@ -18,8 +18,8 @@
 class QMC5883L
 {
 public:
-    QMC5883L(i2c_port_t port = I2C_NUM_0, gpio_num_t sda = GPIO_NUM_43,
-             gpio_num_t scl = GPIO_NUM_44);
+    QMC5883L(i2c_port_t port = I2C_NUM_0, gpio_num_t sda = GPIO_NUM_45,
+             gpio_num_t scl = GPIO_NUM_46);
     esp_err_t init();
     esp_err_t read_raw(int16_t& x, int16_t& y, int16_t& z);
     float get_heading();

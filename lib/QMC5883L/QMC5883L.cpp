@@ -118,10 +118,10 @@ void heading_task(void* args)
             display->unhold_pins();
             display->fill_rectangle(0, Y, 180, Y + Font_7x10.height,
                                     ST7735_BLACK);
-            display->hold_pins();
             snprintf(buf, sizeof(buf), "%udeg", heading);
             display->write_str(0, Y, buf, Font_7x10, ST7735_WHITE,
                                ST7735_BLACK);
+            display->hold_pins();
         }
         else
         {
