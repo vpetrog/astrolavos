@@ -11,10 +11,10 @@
 
 #pragma once
 
+#include "HT_st7735.hpp"
 #include "esp_adc/adc_oneshot.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "HT_st7735.hpp"
 
 class BatteryMonitor
 {
@@ -23,9 +23,9 @@ public:
     void output_voltage(HT_st7735* display, float voltage);
     int get_raw();
     float get_voltage(int raw);
+    uint8_t voltage_to_percent(float v);
 
 private:
-    uint8_t voltage_to_percent(float v);
     adc_oneshot_unit_handle_t _adc;
     float _divider;
     adc_channel_t _channel;
@@ -33,3 +33,4 @@ private:
 };
 
 void battery_task(void* args);
+void battery_astrolavos_task(void* args);

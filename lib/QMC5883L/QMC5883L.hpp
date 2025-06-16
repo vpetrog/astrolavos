@@ -34,3 +34,4 @@ private:
 };
 
 void heading_task(void* args);
+void heading_astrolavos_task(void* args);
