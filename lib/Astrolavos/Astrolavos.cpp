@@ -32,6 +32,8 @@ constexpr size_t ASTROLAVOS_MAIN_LOOP_SLEEP = 10 * 1000;
 
 constexpr float EARTH_RADIUS_M = 6371000.0f; // Radius of the Earth in meters
 
+constexpr float ASTROLAVOS_MAXIMUM_ACCEPTABLE_DISTANCE = 30000; /* 30km */
+
 void Astrolavos::updateHealthBattery(uint8_t percentage)
 {
 
@@ -274,6 +276,8 @@ esp_err_t Astrolavos::calculateDistance(int id, float& distance)
 
     float c = 2.0f * atan2(sqrt(a_hav), sqrt(1.0f - a_hav));
     distance = EARTH_RADIUS_M * c;
+    if (distance > ASTROLAVOS_MAXIMUM_ACCEPTABLE_DISTANCE)
+        return ESP_FAIL;
     return ESP_OK;
 }
 
