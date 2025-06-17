@@ -234,6 +234,7 @@ AstrolavosPairedDevice* Astrolavos::getDevice(int id)
 }
 
 gnss_location_t Astrolavos::getCoordinates() { return _coordinates; }
+int Astrolavos::getId() { return _id; }
 
 void Astrolavos::refreshHealthBar()
 {
@@ -381,6 +382,7 @@ void astrolavos_task(void* args)
             astrolavos_app->refreshDevice(i);
         }
         esp_pm_lock_release(lock);
-        utils::delay_ms(astrolavos::ASTROLAVOS_MAIN_LOOP_SLEEP); // Refresh every second
+        utils::delay_ms(
+            astrolavos::ASTROLAVOS_MAIN_LOOP_SLEEP); // Refresh every second
     }
 }
