@@ -436,6 +436,7 @@ void Astrolavos::init(HT_st7735* display)
     _healthStatus.battery = {BATTERY_STATUS_UNKNOWN, 0};
     _healthStatus.gnss = {GNSS_NO_SATELLITES, 0};
     _healthStatus.magnetometer = {MAGNETOMETER_UNINITIALIZED, 0};
+    _coordinates = {std::nanf("No Latitude"), std::nanf("No Longitude"), 0};
     ESP_LOGI(TAG, "Initializing Astrolavos");
     _display->unhold_pins();
     _display->fill_screen(ST7735_BLACK);
