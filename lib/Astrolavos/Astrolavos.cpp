@@ -28,7 +28,7 @@ extern paired_device_auto_config_t
 extern paired_device_auto_config_t this_device;
 
 constexpr size_t ASTROLAVOS_WELCOME_SLEEP = 3 * 1000;
-constexpr size_t ASTROLAVOS_MAIN_LOOP_SLEEP = 10 * 1000;
+constexpr size_t ASTROLAVOS_MAIN_LOOP_SLEEP = 2 * 1000;
 
 constexpr float EARTH_RADIUS_M = 6371000.0f; // Radius of the Earth in meters
 
@@ -480,6 +480,6 @@ void astrolavos_task(void* args)
         }
         esp_pm_lock_release(lock);
         utils::delay_ms(
-            astrolavos::ASTROLAVOS_MAIN_LOOP_SLEEP); // Refresh every second
+            astrolavos::ASTROLAVOS_MAIN_LOOP_SLEEP);
     }
 }
