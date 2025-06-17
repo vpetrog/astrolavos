@@ -20,6 +20,7 @@
 #include <LoRaMockup.hpp>
 #include <QMC5883L.hpp>
 #include <gnss.hpp>
+#include <lora.hpp>
 #include <pins.hpp>
 #include <utils.hpp>
 
@@ -132,6 +133,11 @@ extern "C" void app_main()
     xTaskCreate(loraMockupInitReceiver_task, "lora_mockup_receiver_task", 4096,
                 &astrolavos_app, 1, NULL);
 #endif
+    xTaskCreate(lora_rx_astrolavos_task, "lora_rx_task", 4096, &astrolavos_app,
+                1, NULL);
+    xTaskCreate(lora_rx_astrolavos_task, "lora_tx_task", 4096, &astrolavos_app,
+                1, NULL);
+
     vTaskSuspend(NULL);
 }
 #endif

@@ -444,6 +444,7 @@ void Astrolavos::setMagnetometer(QMC5883L* magnetometer)
 {
     _magnetometer = magnetometer;
 }
+LoRa& Astrolavos::getLoRa() { return _lora; }
 
 void Astrolavos::refreshHealthBar()
 {
@@ -670,6 +671,7 @@ void Astrolavos::init(HT_st7735* display)
     _display->fill_screen(ST7735_BLACK);
     _display->hold_pins();
     initIWTMInterrupt();
+    _lora.init();
 
     esp_sleep_enable_gpio_wakeup();
 

@@ -16,6 +16,8 @@
 #include <HT_st7735.hpp>
 #include <QMC5883L.hpp>
 #include <array>
+#include <lora.hpp>
+
 #ifndef ASTROLAVOS_NUMBER_OF_DEVICES
 #define ASTROLAVOS_NUMBER_OF_DEVICES 4 // Default number of devices#
 #endif
@@ -128,7 +130,7 @@ public:
     /**
      * @brief Trigger the IWTM mode. A very minimal method to be triggered
      * from the ISR
-     * 
+     *
      */
     void triggerIWTM();
 
@@ -202,6 +204,13 @@ public:
      * @param magnetometer
      */
     void setMagnetometer(QMC5883L* magnetometer);
+
+    /**
+     * @brief Get LoRa.
+     *
+     * @return LoRa object
+     */
+    LoRa& getLoRa();
 
 private:
     /**
@@ -289,6 +298,7 @@ private:
     bool _i_want_to_meet_mode_triggered = false; /* I Want To Meet mode flag */
     bool _is_booted = false;       /* Indicates whether Astrolavos is booted */
     bool _setup_requested = false; /* Indicates whether setup is requested */
+    LoRa _lora;
 };
 
 typedef struct
