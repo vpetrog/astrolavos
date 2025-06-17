@@ -391,9 +391,9 @@ void Astrolavos::refreshDevice(int id)
     bool is_valid = true;
 
     float distance;
-    float heading;
+    float target_absolute_heading;
     if (calculateDistance(id, distance) != ESP_OK ||
-        calculateHeading(id, heading) != ESP_OK)
+        calculateHeading(id, target_absolute_heading) != ESP_OK)
         is_valid = false;
 
     const int Y = Font_7x10.height * id; /* Assume id [0,5] */
@@ -401,11 +401,13 @@ void Astrolavos::refreshDevice(int id)
     char direction_buf[3];
     if (is_valid)
     {
-        printDirection(calculateDirectionQuart(heading), direction_buf);
-        int heading_int = static_cast<int>(heading);
+        printDirection(calculateDirectionQuart(target_absolute_heading),
+                       direction_buf);
+        int target_absolute_heading_int =
+            static_cast<int>(target_absolute_heading);
         int distance_int = static_cast<int>(distance);
-        snprintf(buf, sizeof(buf), "%s: %dm go %s ", device->getName(),
-                 distance_int, direction_buf);
+        snprintf(buf, sizeof(buf), "%s %dm go %s (%d)", device->getName(),
+                 distance_int, direction_buf, target_absolute_heading_int);
     }
     else
     {
@@ -419,7 +421,8 @@ void Astrolavos::refreshDevice(int id)
     _display->hold_pins();
     ESP_LOGI(TAG, "Device %d: %s", id, buf);
     ESP_LOGI(TAG, "Device %d: Distance: %dm, Absolute Heading: %d°", id,
-             static_cast<int>(distance), static_cast<int>(heading));
+             static_cast<int>(distance),
+             static_cast<int>(target_absolute_heading));
     /*TODO: We could perhaps do something with the freshness */
 }
 
