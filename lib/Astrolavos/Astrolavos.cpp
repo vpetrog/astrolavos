@@ -233,6 +233,8 @@ AstrolavosPairedDevice* Astrolavos::getDevice(int id)
     return nullptr;
 }
 
+gnss_location_t Astrolavos::getCoordinates() { return _coordinates; }
+
 void Astrolavos::refreshHealthBar()
 {
     /* The Display row is 160 pixels Wide, with at a Font size of 7x10

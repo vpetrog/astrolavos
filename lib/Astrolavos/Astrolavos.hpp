@@ -92,6 +92,13 @@ public:
      */
     void refreshDevice(int id);
 
+    /**
+     * @brief Get the current coordinates
+     *
+     * @return gnss_location_t
+     */
+    gnss_location_t getCoordinates();
+
 private:
     /**
      * @brief Calculate the heading to the device with the given ID.
