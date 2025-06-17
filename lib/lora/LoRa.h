@@ -10,7 +10,7 @@
 #include "arduino-compat.hpp"
 #include "Stream.h"
 // #include <Arduino.h>
-// #include <SPI.h>
+#include "SPI.h"
 
 #define LORA_DEFAULT_SS_PIN     18
 #define LORA_DEFAULT_RESET_PIN  14
@@ -117,7 +117,6 @@ private:
   static void onDio0Rise();
 
 private:
-// TODO: Port SPI
   SPISettings _spiSettings;
   int _ss;
   int _reset;

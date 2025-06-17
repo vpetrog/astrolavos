@@ -1,7 +1,8 @@
-// Copied from
+// Copied and slightly modified from
 // https://github.com/HelTecAutomation/Heltec_ESP32/blob/dc47ed5b669377cdbdd33a4772c22720f553064a/src/lora/LoRa.cpp
 
 #include "LoRa.h"
+#include "io_pin_remap.h"
 
 // registers
 #define REG_FIFO                 0x00

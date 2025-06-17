@@ -11,10 +11,6 @@
 #include <utils.hpp>
 #include "esp32-hal-gpio.h"
 
-// --------------------------- io_pin_remap.h ----------------------------------
-// TODO: Confirm there is no pin remapping, so this definition is enough
-#define digitalPinToGPIONumber(digitalPin) (digitalPin)
-
 // ----------------------------- Arduino.h -------------------------------------
 #define LSBFIRST 0
 #define MSBFIRST 1

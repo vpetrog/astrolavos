@@ -1,4 +1,4 @@
-// Copied and slightly modified from
+// Copied from
 // https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series/blob/52295875c83eecb6f9ce33dfd96acfb6f0e9bf42/cores/esp32/pgmspace.h
 
 /*
