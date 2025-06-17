@@ -99,6 +99,13 @@ public:
      */
     gnss_location_t getCoordinates();
 
+    /**
+     * @brief Get the ID of astrolavos
+     *
+     * @return int the ID of astrolavos or ID_ASTROLAVOS_NOT_INITIALIZED
+     */
+    int getId();
+
 private:
     /**
      * @brief Calculate the heading to the device with the given ID.
