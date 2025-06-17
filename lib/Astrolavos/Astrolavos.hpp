@@ -115,6 +115,24 @@ private:
      * calculated.
      */
     esp_err_t calculateHeading(int id, float& heading);
+
+    /**
+     * @brief Calculate the direction quarterion based on the heading angle.
+     *
+     * @param heading_angle
+     * @return direction_t
+     */
+    direction_t calculateDirectionQuart(float heading);
+
+    /**
+     * @brief  Print the direction + null terminate
+     *
+     * @param direction
+     * @param buf a buf of size 3 to hold the direction string and null
+     * termination
+     */
+    void printDirection(direction_t direction, char buf[3]);
+
     /**
      * @brief Calculate the distance to the device with the given ID.
      *

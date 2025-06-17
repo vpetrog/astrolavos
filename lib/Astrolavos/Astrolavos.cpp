@@ -149,6 +149,91 @@ esp_err_t Astrolavos::calculateHeading(int id, float& heading)
     return ESP_OK;
 }
 
+direction_t Astrolavos::calculateDirectionQuart(float target_heading)
+{
+    float relativeHeading = target_heading - _heading.heading;
+
+    while (relativeHeading < 0)
+    {
+        relativeHeading += 360.0f;
+    }
+    while (relativeHeading >= 360.0f)
+    {
+        relativeHeading -= 360.0f;
+    }
+
+    if (relativeHeading >= 337.5f || relativeHeading < 22.5f)
+    {
+        return ASTROLAVOS_DIRECTION_FRONT;
+    }
+    else if (relativeHeading >= 22.5f && relativeHeading < 67.5f)
+    {
+        return ASTROLAVOS_DIRECTION_FRONT_RIGHT;
+    }
+    else if (relativeHeading >= 67.5f && relativeHeading < 112.5f)
+    {
+        return ASTROLAVOS_DIRECTION_RIGHT;
+    }
+    else if (relativeHeading >= 112.5f && relativeHeading < 157.5f)
+    {
+        return ASTROLAVOS_DIRECTION_BACK_RIGHT;
+    }
+    else if (relativeHeading >= 157.5f && relativeHeading < 202.5f)
+    {
+        return ASTROLAVOS_DIRECTION_BACK;
+    }
+    else if (relativeHeading >= 202.5f && relativeHeading < 247.5f)
+    {
+        return ASTROLAVOS_DIRECTION_BACK_LEFT;
+    }
+    else if (relativeHeading >= 247.5f && relativeHeading < 292.5f)
+    {
+        return ASTROLAVOS_DIRECTION_LEFT;
+    }
+    else if (relativeHeading >= 292.5f && relativeHeading < 337.5f)
+    {
+        return ASTROLAVOS_DIRECTION_FRONT_LEFT;
+    }
+    else
+    {
+        return ASTROLAVOS_DIRECTION_UNKNOWN;
+    }
+}
+
+void Astrolavos::printDirection(direction_t direction, char buf[3])
+{
+    switch (direction)
+    {
+        case ASTROLAVOS_DIRECTION_FRONT:
+            snprintf(buf, 3, "F");
+            break;
+        case ASTROLAVOS_DIRECTION_FRONT_RIGHT:
+            snprintf(buf, 3, "FR");
+            break;
+        case ASTROLAVOS_DIRECTION_RIGHT:
+            snprintf(buf, 3, "R");
+            break;
+        case ASTROLAVOS_DIRECTION_BACK_RIGHT:
+            snprintf(buf, 3, "BR");
+            break;
+        case ASTROLAVOS_DIRECTION_BACK:
+            snprintf(buf, 3, "B");
+            break;
+        case ASTROLAVOS_DIRECTION_BACK_LEFT:
+            snprintf(buf, 3, "BL");
+            break;
+        case ASTROLAVOS_DIRECTION_LEFT:
+            snprintf(buf, 3, "L");
+            break;
+        case ASTROLAVOS_DIRECTION_FRONT_LEFT:
+            snprintf(buf, 3, "FL");
+            break;
+        default:
+            snprintf(buf, 3, "?");
+            break;
+    }
+}
+
 esp_err_t Astrolavos::calculateDistance(int id, float& distance)
 {
     if (id < 0 || id >= ASTROLAVOS_NUMBER_OF_DEVICES)
@@ -309,12 +394,14 @@ void Astrolavos::refreshDevice(int id)
 
     const int Y = Font_7x10.height * id; /* Assume id [0,5] */
     char buf[23];
+    char direction_buf[3];
     if (is_valid)
     {
+        printDirection(calculateDirectionQuart(heading), direction_buf);
         int heading_int = static_cast<int>(heading);
         int distance_int = static_cast<int>(distance);
-        snprintf(buf, sizeof(buf), "%s: %dm %do", device->getName(),
-                 distance_int, heading_int);
+        snprintf(buf, sizeof(buf), "%s: %dm go %s ", device->getName(),
+                 distance_int, direction_buf);
     }
     else
     {
@@ -327,6 +414,8 @@ void Astrolavos::refreshDevice(int id)
                         ST7735_BLACK);
     _display->hold_pins();
     ESP_LOGI(TAG, "Device %d: %s", id, buf);
+    ESP_LOGI(TAG, "Device %d: Distance: %dm, Absolute Heading: %d°", id,
+             static_cast<int>(distance), static_cast<int>(heading));
     /*TODO: We could perhaps do something with the freshness */
 }
 

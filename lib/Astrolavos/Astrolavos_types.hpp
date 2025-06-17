@@ -78,6 +78,19 @@ typedef struct
     int64_t ts;    /* Timestamp of the last update in usec */
 } heading_t;
 
+typedef enum
+{
+    ASTROLAVOS_DIRECTION_FRONT,
+    ASTROLAVOS_DIRECTION_FRONT_LEFT,
+    ASTROLAVOS_DIRECTION_LEFT,
+    ASTROLAVOS_DIRECTION_BACK_LEFT,
+    ASTROLAVOS_DIRECTION_BACK,
+    ASTROLAVOS_DIRECTION_BACK_RIGHT,
+    ASTROLAVOS_DIRECTION_RIGHT,
+    ASTROLAVOS_DIRECTION_FRONT_RIGHT,
+    ASTROLAVOS_DIRECTION_UNKNOWN
+} direction_t;
+
 typedef struct
 {
     int id;
