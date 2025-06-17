@@ -16,6 +16,7 @@
 #include <Astrolavos.hpp>
 #include <BatteryMonitor.hpp>
 #include <HT_st7735.hpp>
+#include <LoRaMockup.hpp>
 #include <QMC5883L.hpp>
 #include <gnss.hpp>
 #include <pins.hpp>
@@ -96,7 +97,10 @@ extern "C" void app_main()
     xTaskCreate(blinking_task, "blinking_task", 4096, nullptr, 3, NULL);
     xTaskCreate(heading_astrolavos_task, "heading_task", 4096, &astrolavos_app,
                 4, NULL);
-
+#if defined(ASTROLAVOS_MOCKUP_LORA_RECEIVER)
+    xTaskCreate(loraMockupInitReceiver_task, "lora_mockup_receiver_task", 4096,
+                &astrolavos_app, 1, NULL);
+#endif
     vTaskSuspend(NULL);
 }
 #endif
