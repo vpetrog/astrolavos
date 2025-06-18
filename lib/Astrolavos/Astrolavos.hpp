@@ -93,6 +93,13 @@ public:
     void refreshDevice(int id);
 
     /**
+     * @brief Get the Sleep Duration
+     *
+     * @return const sleep_duration_t*
+     */
+    const sleep_duration_t* getSleepDuration();
+
+    /**
      * @brief Get the current coordinates
      *
      * @return gnss_location_t
@@ -166,6 +173,7 @@ private:
     char _name[6];                           /* Name of the Astrolavos device */
     uint16_t _color = 0x0000;
     SemaphoreHandle_t _health_mutex = nullptr;
+    const sleep_duration_t* _sleep_duration = nullptr;
 };
 
 typedef struct

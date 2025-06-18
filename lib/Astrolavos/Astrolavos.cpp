@@ -28,11 +28,17 @@ extern paired_device_auto_config_t
 extern paired_device_auto_config_t this_device;
 
 constexpr size_t ASTROLAVOS_WELCOME_SLEEP = 3 * 1000;
-constexpr size_t ASTROLAVOS_MAIN_LOOP_SLEEP = 2 * 1000;
 
 constexpr float EARTH_RADIUS_M = 6371000.0f; // Radius of the Earth in meters
 
 constexpr float ASTROLAVOS_MAXIMUM_ACCEPTABLE_DISTANCE = 30000; /* 30km */
+
+const sleep_duration_t normal_sleep_duration = {
+    .heading = 1000,          /* 1 second */
+    .main_app_refresh = 2000, /* 2 seconds */
+    .battery = 60000,         /* 1 minute */
+    .blinking = 1500          /* 3.5 seconds */
+};
 
 void Astrolavos::updateHealthBattery(uint8_t percentage)
 {
@@ -305,6 +311,11 @@ void Astrolavos::initialisePairedDevices()
     }
 }
 
+const sleep_duration_t* Astrolavos::getSleepDuration()
+{
+    return _sleep_duration;
+}
+
 AstrolavosPairedDevice* Astrolavos::getDevice(int id)
 {
     if (id < 0)
@@ -479,7 +490,6 @@ void astrolavos_task(void* args)
             astrolavos_app->refreshDevice(i);
         }
         esp_pm_lock_release(lock);
-        utils::delay_ms(
-            astrolavos::ASTROLAVOS_MAIN_LOOP_SLEEP);
+        utils::delay_ms(astrolavos_app->getSleepDuration()->main_app_refresh);
     }
 }

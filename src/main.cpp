@@ -24,10 +24,10 @@
 
 static const char* TAG = "main";
 
-constexpr size_t BLINKING_TASK_SLEEP = 3500;
-
 void blinking_task(void* args)
 {
+    astrolavos::Astrolavos* astrolavos_app =
+        static_cast<astrolavos::Astrolavos*>(args);
     gpio_set_direction(heltec::PIN_LED_WRITE_CTRL, GPIO_MODE_OUTPUT);
     ESP_LOGI(TAG, "Blinking Task started");
     while (true)
@@ -37,12 +37,12 @@ void blinking_task(void* args)
         gpio_set_level(heltec::PIN_LED_WRITE_CTRL, 1);
         gpio_hold_en(heltec::PIN_LED_WRITE_CTRL);
 
-        utils::delay_ms(BLINKING_TASK_SLEEP);
+        utils::delay_ms(astrolavos_app->getSleepDuration()->blinking);
 
         gpio_hold_dis(heltec::PIN_LED_WRITE_CTRL);
         gpio_set_level(heltec::PIN_LED_WRITE_CTRL, 0);
         gpio_hold_en(heltec::PIN_LED_WRITE_CTRL);
-        utils::delay_ms(BLINKING_TASK_SLEEP);
+        utils::delay_ms(astrolavos_app->getSleepDuration()->blinking);
     }
 }
 
@@ -94,7 +94,7 @@ extern "C" void app_main()
                 NULL);
     xTaskCreate(battery_astrolavos_task, "battery_task", 4096, &astrolavos_app,
                 2, NULL);
-    xTaskCreate(blinking_task, "blinking_task", 4096, nullptr, 3, NULL);
+    xTaskCreate(blinking_task, "blinking_task", 4096, &astrolavos_app, 3, NULL);
     xTaskCreate(heading_astrolavos_task, "heading_task", 4096, &astrolavos_app,
                 4, NULL);
 #if defined(ASTROLAVOS_MOCKUP_LORA_RECEIVER)
