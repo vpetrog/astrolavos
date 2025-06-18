@@ -71,8 +71,7 @@ BatteryMonitor::BatteryMonitor(adc_channel_t channel)
     _channel = channel;
 
     gpio_reset_pin(heltec::PIN_ADC_CTRL);
-    gpio_set_direction(heltec::PIN_ADC_CTRL,
-                       GPIO_MODE_OUTPUT); // Disable digital input/output
+    gpio_set_direction(heltec::PIN_ADC_CTRL, GPIO_MODE_OUTPUT);
 
     adc_oneshot_unit_init_cfg_t unit_cfg{
         .unit_id = ADC_UNIT_1,
@@ -82,10 +81,8 @@ BatteryMonitor::BatteryMonitor(adc_channel_t channel)
     ESP_ERROR_CHECK(adc_oneshot_new_unit(&unit_cfg, &_adc));
 
     /* configure the specific channel (GPIO 1  → ADC1_CH0) */
-    adc_oneshot_chan_cfg_t chan_cfg{
-        .atten = ADC_ATTEN_DB_12,
-        .bitwidth = ADC_BITWIDTH_12 // 12-bit on ESP32-S3
-    };
+    adc_oneshot_chan_cfg_t chan_cfg{.atten = ADC_ATTEN_DB_12,
+                                    .bitwidth = ADC_BITWIDTH_12};
     ESP_ERROR_CHECK(adc_oneshot_config_channel(_adc, _channel, &chan_cfg));
 }
 
@@ -179,6 +176,6 @@ void battery_astrolavos_task(void* args)
 
         ESP_LOGI(TAG, "Battery Voltage: %.2f V Raw=%d", voltage, raw);
         esp_pm_lock_release(lock);
-        utils::delay_ms(BATTERY_TASK_SLEEP);
+        utils::delay_ms(astrolavos_app->getSleepDuration()->battery);
     }
 }

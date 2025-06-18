@@ -175,6 +175,7 @@ void heading_astrolavos_task(void* args)
                 astrolavos::magnetometer_health_t::MAGNETOMETER_ERROR);
         }
         esp_pm_lock_release(lock);
-        utils::delay_ms(HEADING_TASK_SLEEP); // Adjust delay as needed
+        utils::delay_ms(astrolavos_app->getSleepDuration()
+                            ->heading);
     }
 }

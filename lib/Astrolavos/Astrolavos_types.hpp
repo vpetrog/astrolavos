@@ -11,8 +11,8 @@
 
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
-
 namespace astrolavos
 {
 
@@ -90,6 +90,14 @@ typedef enum
     ASTROLAVOS_DIRECTION_FRONT_RIGHT,
     ASTROLAVOS_DIRECTION_UNKNOWN
 } direction_t;
+
+typedef struct
+{
+    std::size_t heading;
+    std::size_t main_app_refresh;
+    std::size_t battery;
+    std::size_t blinking;
+} sleep_duration_t;
 
 typedef struct
 {
