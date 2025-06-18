@@ -39,7 +39,7 @@ void loraMockupInitReceiver_task(void* args)
     constexpr float METERS_TO_DEGREES_LAT =
         1.0 / 111000.0; /* Approximate conversion factor for latitude */
     constexpr float METERS_TO_DEGREES_LON = 0.00001476; /* Near Berlin */
-    constexpr float MAX_OFFSET_METERS = 5000.0;
+    constexpr float MAX_OFFSET_METERS = 1200.0;
     constexpr float MAX_OFFSET_DEGREES_LAT =
         METERS_TO_DEGREES_LAT * MAX_OFFSET_METERS;
     constexpr float MAX_OFFSET_DEGREES_LON =
@@ -102,7 +102,7 @@ void loraMockupInitReceiver_task(void* args)
                      target_device_id, random_coords.latitude,
                      random_coords.longitude, wants_to_meet ? "true" : "false");
         }
-        
+
         else
         {
             ESP_LOGE(TAG_RECEIVER, "Failed to update device %d coordinates",
