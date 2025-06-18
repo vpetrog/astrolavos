@@ -5,7 +5,6 @@ Astrolavos (*Ancient Greek: ἀστρολάβος*) is an astronomical instrumen
 You and your friends are unique stars in the festival sky, and Astrolavos will help you find each other (#cringe)
 
 
-
 ## 1. Introduction
 The project aims to be an OS Festival Friend Finder. The tracker will show the direction and distance of the other paired trackers. The devices are connected to each other via LORA.
 
@@ -25,8 +24,14 @@ The project aims to be an OS Festival Friend Finder. The tracker will show the d
 The display has a health bar on bottom that show the battery level, the GNSS status and the status of the magnetometer (magnetic compass). The main display has has up to 6 lines each one showing the distance and direction to a paired device.
 
 There are two modes of operation:
-- **Isolation Mode**: When you don't care about your friends, and just want to dance. The device will keep exchanging data, as your friends might actually care about you. In this mode the display is off and the device is consuming less power. It is recommended to be on this mode when you are not actively looking for your friends.
+
 - **Active Mode**: When you are looking for your friends, the device will show the distance and direction to each of them. The display is on and doing some calculations on the background and as a result is consuming more power.
+
+- **Isolation Mode**: When you don't care about your friends, and just want to dance. The device will keep exchanging data, as your friends might actually care about you. In this mode the display is off and the device is consuming less power. It is recommended to be on this mode when you are not actively looking for your friends. It can be activated bt pressing the small USR button on the top left corner of the device. The effect might take up to 2 seconds to take effect. In order to switch back to active mode, you need to press the button again.
+
+
+In addition to this there is an ***I WANT TO MEET*** option which can be activated by pressing the button the bottom right corner of the device. This will send a message to all paired devices that you want to meet them. The message will be shown on their displays as well as a clear indication on you own display, that you are transmitting this message. To stop transmitting this message, you need to press the button again.
+
 
 ## 4. Software
 
@@ -49,8 +54,8 @@ The project is in very, very, very alpha and under heavy development. Expect fun
 - *Stretch Goal* Power Optimisation ✅
 - *Stretch Goal* Battery Monitoring ✅
 - *Stretch Goal* Isolation Mode ✅
+- *Stretch Goal* *I WANT TO MEET* mode of operation ✅
 - *Stretch Goal* Staleness Detections and Data Freshness 🎯
-- *Stretch Goal* *I WANT TO MEET* mode of operation 🎯
 
 ------------------  Future Plans  -------------------
 
