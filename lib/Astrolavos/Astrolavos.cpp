@@ -376,8 +376,6 @@ bool Astrolavos::getIWantToMeet() { return _i_want_to_meet; }
 void Astrolavos::updateIWantToMeet(bool i_want_to_meet)
 {
     _i_want_to_meet = i_want_to_meet;
-    ESP_LOGI(TAG, "Updated: I want to meet flag to: %s",
-             _i_want_to_meet ? "True" : "False");
 }
 
 void Astrolavos::refreshHealthBar()
@@ -521,6 +519,16 @@ void usr_button_isr_handler(void* args)
         astrolavos_app->triggerIsolationMode();
 }
 
+void iwtm_isr_handler(void* args)
+{
+    astrolavos::Astrolavos* astrolavos_app =
+        static_cast<astrolavos::Astrolavos*>(args);
+    if (astrolavos_app)
+    {
+        astrolavos_app->updateIWantToMeet(!astrolavos_app->getIWantToMeet());
+    }
+}
+
 void Astrolavos::initSwitchInterrupt()
 {
     gpio_config_t io_conf = {
@@ -534,6 +542,21 @@ void Astrolavos::initSwitchInterrupt()
 
     gpio_install_isr_service(0); // pass 0 to use default
     gpio_isr_handler_add(heltec::PIN_USR_SWITCH, usr_button_isr_handler, this);
+}
+
+void Astrolavos::initIWTMInterrupt()
+{
+    gpio_config_t io_conf = {
+        .pin_bit_mask = 1ULL << static_cast<uint64_t>(heltec::PIN_IWTM_SWITCH),
+        .mode = GPIO_MODE_INPUT,
+        .pull_up_en = GPIO_PULLUP_ENABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_NEGEDGE // falling edge
+    };
+    gpio_config(&io_conf);
+
+    gpio_install_isr_service(0); // pass 0 to use default
+    gpio_isr_handler_add(heltec::PIN_IWTM_SWITCH, iwtm_isr_handler, this);
 }
 
 void Astrolavos::init(HT_st7735* display)
@@ -566,6 +589,7 @@ void Astrolavos::init(HT_st7735* display)
     _display->fill_screen(ST7735_BLACK);
     _display->hold_pins();
     initSwitchInterrupt();
+    initIWTMInterrupt();
 
     ESP_LOGI(TAG, "Astrolavos initialized with ID: %d, Name: %s", _id, _name);
 }
