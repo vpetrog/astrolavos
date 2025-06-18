@@ -89,7 +89,7 @@ int Astrolavos::updateDeviceCoordinates(int id,
         return ESP_ERR_NOT_FOUND;
     }
 
-    _devices[id].updateCoordinates(coordinates);
+    device->updateCoordinates(coordinates);
     return ESP_OK;
 }
 
@@ -130,7 +130,7 @@ esp_err_t Astrolavos::calculateHeading(int id, float& heading)
     }
 
     gnss_location_t target = device->getCoordinates();
-    if (target.latitude == std::nanf("No Latitude") &&
+    if (target.latitude == std::nanf("No Latitude") ||
         target.longitude == std::nanf("No Longitude"))
     {
         return ESP_ERR_INVALID_ARG;
