@@ -20,8 +20,13 @@ The project aims to be an OS Festival Friend Finder. The tracker will show the d
 - [GY-271 Magnetometer](https://www.az-delivery.de/en/products/gy-271-kompassmodul-kompass-magnet-sensor-fuer-arduino-und-raspberry-pi?variant=18912984432736)
 - Any 3000mAh  LiPO 1S/1C with JST 1.25 Connector [like this one](https://www.amazon.de/-/en/dp/B0F18ST3K5?ref=ppx_yo2ov_dt_b_fed_asin_title)
 
-## 3. Schematics
-TBF
+## 3. Usage
+
+The display has a health bar on bottom that show the battery level, the GNSS status and the status of the magnetometer (magnetic compass). The main display has has up to 6 lines each one showing the distance and direction to a paired device.
+
+There are two modes of operation:
+- **Isolation Mode**: When you don't care about your friends, and just want to dance. The device will keep exchanging data, as your friends might actually care about you. In this mode the display is off and the device is consuming less power. It is recommended to be on this mode when you are not actively looking for your friends.
+- **Active Mode**: When you are looking for your friends, the device will show the distance and direction to each of them. The display is on and doing some calculations on the background and as a result is consuming more power.
 
 ## 4. Software
 
@@ -41,10 +46,11 @@ The project is in very, very, very alpha and under heavy development. Expect fun
 
 ------------------ 🚀 MVP 🚀 -------------------
 
-- *Stretch Goal* Power Optimisation 🚧
+- *Stretch Goal* Power Optimisation ✅
 - *Stretch Goal* Battery Monitoring ✅
+- *Stretch Goal* Isolation Mode ✅
 - *Stretch Goal* Staleness Detections and Data Freshness 🎯
-- *Stretch Goal* Isolation Mode 🎯
+- *Stretch Goal* *I WANT TO MEET* mode of operation 🎯
 
 ------------------  Future Plans  -------------------
 
