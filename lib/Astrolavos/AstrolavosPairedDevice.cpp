@@ -17,6 +17,16 @@
 namespace astrolavos
 
 {
+AstrolavosPairedDevice::AstrolavosPairedDevice()
+{
+    _id = ID_ASTROLAVOS_NOT_INITIALIZED; // Default ID for uninitialized device
+    _colour = 0x0000;
+    _is_active = false;
+    _name[0] = '\0';
+    _coordinates.latitude = std::nanf("Not Initialised");
+    _coordinates.longitude = std::nanf("Not Initialised");
+}
+
 int AstrolavosPairedDevice::getId() { return _id; }
 
 void AstrolavosPairedDevice::updateCoordinates(gnss_location_t coordinates)
