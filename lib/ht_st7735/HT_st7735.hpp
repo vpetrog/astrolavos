@@ -109,6 +109,8 @@ public:
     void unhold_pins(void);
     void set_backlight(const uint8_t percent);
     void hold_backlight(bool enable = true);
+    void turn_off();
+    void turn_on();
 
 private:
     /* SPI helpers */
