@@ -108,7 +108,11 @@ typedef struct
 
 typedef struct
 {
-    gnss_location_t coordinates;
+    gnss_location_t coordinates; /* GNSS coordinates of the device */
+    bool wants_to_meet; /* Indicates whether this device wants to meet */
+
+    /*TODO: We should probably add a checksum or some sort of signature to
+     * validate the authenticity/validity */
 } device_data_t;
 
 /* TODO: Any LoRa Related Structs */

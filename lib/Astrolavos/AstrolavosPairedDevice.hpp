@@ -30,12 +30,14 @@ public:
     bool isActive();
     void setActive(bool active);
     int getId();
+    bool getWantsToMeet() const;
 
 private:
     int _id;                      /* Unique identifier for the device */
     gnss_location_t _coordinates; /* GNSS coordinates of the device */
     uint16_t _colour;             /* Color of the device in RGB565 format */
     char _name[7];                /* Name Associated to the device */
+    bool _wants_to_meet; /* indicates whether this device wants to meet */
     bool _is_active; /* Is the device active? TODO: Do not show unused devices
                        future extension */
     /*TODO: Probably we will need more fields for LoRa */

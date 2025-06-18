@@ -21,6 +21,7 @@ AstrolavosPairedDevice::AstrolavosPairedDevice()
 {
     _id = ID_ASTROLAVOS_NOT_INITIALIZED; // Default ID for uninitialized device
     _colour = 0x0000;
+    _wants_to_meet = false;
     _is_active = false;
     _name[0] = '\0';
     _coordinates.latitude = std::nanf("Not Initialised");
@@ -32,6 +33,7 @@ int AstrolavosPairedDevice::getId() { return _id; }
 void AstrolavosPairedDevice::updateDevice(device_data_t data)
 {
     _coordinates = data.coordinates;
+    _wants_to_meet = data.wants_to_meet;
 }
 
 gnss_location_t AstrolavosPairedDevice::getCoordinates()
@@ -79,6 +81,8 @@ void AstrolavosPairedDevice::setName(const char* new_name)
     memcpy(_name, new_name, len);
     _name[len] = '\0';
 }
+
+bool AstrolavosPairedDevice::getWantsToMeet() const { return _wants_to_meet; }
 
 bool AstrolavosPairedDevice::isActive() { return _is_active; }
 void AstrolavosPairedDevice::setActive(bool active) { _is_active = active; }

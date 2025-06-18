@@ -371,6 +371,15 @@ void Astrolavos::updateIsolationMode()
 
 bool Astrolavos::getIsolationMode() { return _isolation_mode; }
 
+bool Astrolavos::getIWantToMeet() { return _i_want_to_meet; }
+
+void Astrolavos::updateIWantToMeet(bool i_want_to_meet)
+{
+    _i_want_to_meet = i_want_to_meet;
+    ESP_LOGI(TAG, "Updated: I want to meet flag to: %s",
+             _i_want_to_meet ? "True" : "False");
+}
+
 void Astrolavos::refreshHealthBar()
 {
     /* The Display row is 160 pixels Wide, with at a Font size of 7x10

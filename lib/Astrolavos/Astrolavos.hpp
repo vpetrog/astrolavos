@@ -143,6 +143,21 @@ public:
      */
     bool getIsolationMode();
 
+    /**
+     * @brief Update the flag to inidicate the I wantToMeet Mode
+     *
+     * @param i_want_to_meet
+     */
+    void updateIWantToMeet(bool i_want_to_meet);
+
+    /**
+     * @brief Ge the I Want To Meet status
+     *
+     * @return true
+     * @return false
+     */
+    bool getIWantToMeet();
+
 private:
     /**
      * @brief Calculate the heading to the device with the given ID.
@@ -215,6 +230,7 @@ private:
     bool _isolation_mode_triggered = false; /* Isolation mode flag */
     bool _isolation_mode = false;           /* Isolation mode */
     const sleep_duration_t* _sleep_duration = nullptr;
+    bool _i_want_to_meet = false; /* Indicates whether I want to meet */
 };
 
 typedef struct
