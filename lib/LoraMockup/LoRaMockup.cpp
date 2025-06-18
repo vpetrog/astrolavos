@@ -85,19 +85,24 @@ void loraMockupInitReceiver_task(void* args)
         random_coords.latitude = current_coords.latitude + lat_offset;
         random_coords.longitude = current_coords.longitude + lon_offset;
         random_coords.ts = esp_timer_get_time();
+
+        bool wants_to_meet =
+            (esp_random() % 4) ? false : true; /* 25% chance to wants to meet */
+
         astrolavos::device_data_t random_data = {
-            .coordinates = random_coords,
-        };
+            .coordinates = random_coords, .wants_to_meet = wants_to_meet};
         esp_err_t result =
             astrolavos_app->updateDevice(target_device_id, random_data);
 
         if (result == ESP_OK)
         {
             ESP_LOGI(TAG_RECEIVER,
-                     "Updated device %d coordinates: lat=%.6f, lon=%.6f",
+                     "Updated device %d coordinates: lat=%.6f, lon=%.6f, "
+                     "wants_to_meet=%s",
                      target_device_id, random_coords.latitude,
-                     random_coords.longitude);
+                     random_coords.longitude, wants_to_meet ? "true" : "false");
         }
+        
         else
         {
             ESP_LOGE(TAG_RECEIVER, "Failed to update device %d coordinates",
