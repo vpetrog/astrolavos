@@ -320,5 +320,5 @@ void HT_st7735::turn_on()
     cmd(ST7735_DISPON);
     unselect();
     xSemaphoreGive(_mutex);
-    set_backlight(50); // Restore backlight to 100%
+    set_backlight(80);
 }

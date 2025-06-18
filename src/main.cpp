@@ -76,7 +76,7 @@ extern "C" void app_main()
     HT_st7735 display;
     astrolavos::Astrolavos astrolavos_app;
     display.init();
-    display.set_backlight(10);
+    display.set_backlight(80);
     esp_pm_config_t pm_config = {
         .max_freq_mhz = 240,
         .min_freq_mhz = 10,
