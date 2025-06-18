@@ -211,11 +211,11 @@ void HT_st7735::write_str(uint16_t x, uint16_t y, const char* s, FontDef f,
 void HT_st7735::fill_rectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h,
                                uint16_t col)
 {
-    if (x >= _width || y >= _height)
+    if (x >= _width || y >= _height || w == 0 || h == 0)
         return;
-    if (x + w - 1 >= _width)
+    if (x + w > _width)
         w = _width - x;
-    if (y + h - 1 >= _height)
+    if (y + h > _height)
         h = _height - y;
     xSemaphoreTake(_mutex, portMAX_DELAY);
     select();
