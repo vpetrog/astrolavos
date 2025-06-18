@@ -52,15 +52,14 @@ public:
     void updateHealthMagnetometer(magnetometer_health_t status);
 
     /**
-     * @brief Update the coordinates of the device with the given ID.
+     * @brief Update a device with the received data
      *
      * @param id Unique identifier for the device.
-     * @param coordinates GNSS coordinates of the device.
+     * @param data The data received
      * @return esp_err_t 0 on success, or an error code on failure.TODO: error
      * codes
      */
-    esp_err_t updateDeviceCoordinates(int id,
-                                      const gnss_location_t coordinates);
+    esp_err_t updateDevice(int id, const device_data_t data);
 
     /**
      * @brief Update the heading of astrolavos
