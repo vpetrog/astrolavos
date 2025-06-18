@@ -396,24 +396,24 @@ void Astrolavos::refreshHealthBar()
                  _healthStatus.gnss.num_satellites % 100);
     }
 
-    char mag_status;
-    if (_healthStatus.magnetometer.status == MAGNETOMETER_HEALTHY)
+    char mag_status[4];
+    switch (_healthStatus.magnetometer.status)
     {
-        mag_status = 'v';
+        case MAGNETOMETER_HEALTHY:
+            snprintf(mag_status, sizeof(mag_status), "%u",
+                     static_cast<uint16_t>(_heading.heading) % 1000);
+            break;
+        case MAGNETOMETER_ERROR:
+            snprintf(mag_status, sizeof(mag_status), "xxx");
+            break;
+        case MAGNETOMETER_UNINITIALIZED:
+            snprintf(mag_status, sizeof(mag_status), "---");
+            break;
+        default:
+            snprintf(mag_status, sizeof(mag_status), "???");
+            break;
     }
-    else if (_healthStatus.magnetometer.status == MAGNETOMETER_ERROR)
-    {
-        mag_status = 'x';
-    }
-    else if (_healthStatus.magnetometer.status == MAGNETOMETER_UNINITIALIZED)
-    {
-        mag_status = '-';
-    }
-    else
-    {
-        mag_status = '?';
-    }
-    snprintf(buf, sizeof(buf), "Bat:%d%% GNSS:%s Mag:%c",
+    snprintf(buf, sizeof(buf), "Bat:%d%% Sat:%s Hdg:%s",
              _healthStatus.battery.percentage % 100, gnss_fixed, mag_status);
     xSemaphoreGive(_health_mutex);
     _display->unhold_pins();
