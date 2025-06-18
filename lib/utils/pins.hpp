@@ -73,4 +73,7 @@ constexpr gpio_num_t PIN_LORA_NSS = GPIO_NUM_8;
 /* USR_SWITCH */
 constexpr gpio_num_t PIN_USR_SWITCH = GPIO_NUM_0;
 
+/* I want to meet switch*/
+constexpr gpio_num_t PIN_IWTM_SWITCH = GPIO_NUM_17;
+
 } /* namespace heltec */

@@ -85,7 +85,7 @@ public:
 
     /**
      * @brief Refresh the display with our I Want To Meet status.
-     * 
+     *
      */
     void refreshIwantToMeet();
 
@@ -222,6 +222,15 @@ private:
      * to toggle the isolation mode on/off
      */
     void initSwitchInterrupt();
+
+    /**
+     * @brief Initialize the I Want To Meet (IWTM) interrupt.
+     *
+     * This function sets up the GPIO pin for the switch and configures the
+     * interrupt handler to respond to switch events. The switch will be used
+     * to toggle the IWTM mode on/off
+     */
+    void initIWTMInterrupt();
 
     std::array<AstrolavosPairedDevice, ASTROLAVOS_NUMBER_OF_DEVICES>
         _devices;                  /* Array of paired devices */
