@@ -12,6 +12,7 @@
  */
 
 #include "HT_st7735.hpp"
+#include "HT_st7735_commands.hpp"
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
@@ -297,4 +298,27 @@ void HT_st7735::set_backlight(uint8_t percent)
     uint32_t duty = ((uint32_t)percent * ((1 << LEDC_RES_BITS) - 1)) / 100;
     ledc_set_duty(LEDC_MODE, LEDC_CH, duty);
     ledc_update_duty(LEDC_MODE, LEDC_CH);
+}
+
+void HT_st7735::turn_off()
+{
+    xSemaphoreTake(_mutex, portMAX_DELAY);
+    select();
+    cmd(ST7735_DISPOFF);
+    unselect();
+    xSemaphoreGive(_mutex);
+    hold_pins();
+    ledc_set_duty(LEDC_MODE, LEDC_CH, 0);
+    ledc_update_duty(LEDC_MODE, LEDC_CH);
+}
+
+void HT_st7735::turn_on()
+{
+    unhold_pins();
+    xSemaphoreTake(_mutex, portMAX_DELAY);
+    select();
+    cmd(ST7735_DISPON);
+    unselect();
+    xSemaphoreGive(_mutex);
+    set_backlight(50); // Restore backlight to 100%
 }
