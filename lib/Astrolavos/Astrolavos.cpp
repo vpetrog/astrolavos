@@ -444,16 +444,19 @@ void Astrolavos::refreshDevice(int id)
         return;
 
     bool is_valid = true;
-
+    bool i_want_to_meet;
     float distance;
     float target_absolute_heading;
     if (calculateDistance(id, distance) != ESP_OK ||
         calculateHeading(id, target_absolute_heading) != ESP_OK)
         is_valid = false;
 
-    const int Y = Font_7x10.height * id; /* Assume id [0,5] */
-    char buf[23];
+    const int Y = Font_7x10.height * id; /* Assume id [0,4] */
+    char buf_name[7];
+    char buf_data[17];
     char direction_buf[3];
+    uint16_t bg_color = ST7735_BLACK;
+    snprintf(buf_name, sizeof(buf_name), "%s", device->getName());
     if (is_valid)
     {
         printDirection(calculateDirectionQuart(target_absolute_heading),
@@ -461,24 +464,53 @@ void Astrolavos::refreshDevice(int id)
         int target_absolute_heading_int =
             static_cast<int>(target_absolute_heading);
         int distance_int = static_cast<int>(distance);
-        snprintf(buf, sizeof(buf), "%s %dm go %s (%d)", device->getName(),
-                 distance_int, direction_buf, target_absolute_heading_int);
+        snprintf(buf_data, sizeof(buf_data), " %dm go %s (%d)", distance_int,
+                 direction_buf, target_absolute_heading_int);
+        i_want_to_meet = device->getWantsToMeet();
+        if (i_want_to_meet)
+            bg_color = ST7735_WHITE;
+
+        ESP_LOGI(TAG,
+                 "Device %d: Distance: %dm, Absolute Heading: %d°, WTM: %s", id,
+                 static_cast<int>(distance),
+                 static_cast<int>(target_absolute_heading),
+                 i_want_to_meet ? "True" : "False");
     }
     else
     {
-        snprintf(buf, sizeof(buf), "%s: No Data", device->getName());
+        snprintf(buf_data, sizeof(buf_data), ": No Data");
     }
-
     _display->unhold_pins();
-    _display->fill_rectangle(0, Y, 160, Y + Font_7x10.height, ST7735_BLACK);
-    _display->write_str(0, Y, buf, Font_7x10, device->getColour(),
-                        ST7735_BLACK);
+    _display->fill_rectangle(0, Y, 160, Font_7x10.height, ST7735_BLACK);
+    _display->write_str(0, Y, buf_name, Font_7x10, device->getColour(),
+                        bg_color);
+    _display->write_str(Font_7x10.width * strlen(device->getName()), Y,
+                        buf_data, Font_7x10, device->getColour(), ST7735_BLACK);
+
     _display->hold_pins();
-    ESP_LOGI(TAG, "Device %d: %s", id, buf);
-    ESP_LOGI(TAG, "Device %d: Distance: %dm, Absolute Heading: %d°", id,
-             static_cast<int>(distance),
-             static_cast<int>(target_absolute_heading));
+    ESP_LOGI(TAG, "Device %d: %s%s", id, buf_name, buf_data);
+
     /*TODO: We could perhaps do something with the freshness */
+}
+
+void Astrolavos::refreshIwantToMeet()
+{
+    /*Print our WantToMeet Mode*/
+    const uint16_t Y_WTM = 80 - (2 * Font_7x10.height);
+    _display->unhold_pins();
+    _display->fill_rectangle(0, Y_WTM, 160, Font_7x10.height, ST7735_BLACK);
+    if (_i_want_to_meet)
+    {
+        _display->fill_rectangle(0, Y_WTM, 3 * Font_7x10.width,
+                                 Font_7x10.height, _color);
+        char wtm_buf[] = "I Want To Meet\0";
+        _display->write_str(4 * Font_7x10.width, Y_WTM, wtm_buf, Font_7x10,
+                            _color, ST7735_BLACK);
+        _display->fill_rectangle(20 * Font_7x10.width, Y_WTM, 160,
+                                 Font_7x10.height, _color);
+    }
+    _display->hold_pins();
+    ESP_LOGI(TAG, "I Want To Meet: %s", _i_want_to_meet ? "True" : "False");
 }
 
 void usr_button_isr_handler(void* args)
@@ -525,8 +557,8 @@ void Astrolavos::init(HT_st7735* display)
                         ST7735_BLACK);
     char buf[4 + 6 + 1]; /* 4 for "Hey ", 6 for name, 1 for null terminator */
     snprintf(buf, sizeof(buf), "Hey %s", _name);
-    _display->write_str(0, Font_11x18.height * 2, buf, Font_11x18, _color,
-                        ST7735_BLACK);
+    _display->write_str(3 * Font_11x18.width, Font_11x18.height * 2, buf,
+                        Font_11x18, _color, ST7735_BLACK);
     _display->hold_pins();
     initialisePairedDevices();
     utils::delay_ms(ASTROLAVOS_WELCOME_SLEEP);
@@ -562,6 +594,7 @@ void astrolavos_task(void* args)
         if (!astrolavos_app->getIsolationMode())
         {
             astrolavos_app->refreshHealthBar();
+            astrolavos_app->refreshIwantToMeet();
             for (int i = 0; i < ASTROLAVOS_NUMBER_OF_DEVICES; i++)
             {
                 astrolavos_app->refreshDevice(i);

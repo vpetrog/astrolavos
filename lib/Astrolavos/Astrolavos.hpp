@@ -84,6 +84,12 @@ public:
     void refreshHealthBar();
 
     /**
+     * @brief Refresh the display with our I Want To Meet status.
+     * 
+     */
+    void refreshIwantToMeet();
+
+    /**
      * @brief Refresh the display with the latest information towards the device
      * with the given ID.
      *
