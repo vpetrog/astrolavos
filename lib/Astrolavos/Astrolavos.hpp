@@ -113,6 +113,37 @@ public:
      */
     int getId();
 
+    /**
+     * @brief Trigger the isolation mode. A very minimal method to be triggered
+     * from the ISR
+     *
+     */
+    void triggerIsolationMode();
+
+    /**
+     * @brief Check if the isolation mode is triggered
+     *
+     * @return true
+     * @return false
+     */
+    bool isIsolationModeTriggered();
+
+    /**
+     * @brief Update the mode of operation of Astrolavos. depending on whether
+     * we are transitioning to isolation or normal mode. Currently things that
+     * are changing are the sleep durations and the display.
+     *
+     */
+    void updateIsolationMode();
+
+    /**
+     * @brief Get our current isolation mode.
+     *
+     * @return true if isolation mode is set
+     * @return false otherwise
+     */
+    bool getIsolationMode();
+
 private:
     /**
      * @brief Calculate the heading to the device with the given ID.
@@ -163,6 +194,15 @@ private:
      */
     AstrolavosPairedDevice* getDevice(int id);
 
+    /**
+     * @brief Initialize the switch interrupt for the Astrolavos system.
+     *
+     * This function sets up the GPIO pin for the switch and configures the
+     * interrupt handler to respond to switch events. The switch will be used
+     * to toggle the isolation mode on/off
+     */
+    void initSwitchInterrupt();
+
     std::array<AstrolavosPairedDevice, ASTROLAVOS_NUMBER_OF_DEVICES>
         _devices;                  /* Array of paired devices */
     health_status_t _healthStatus; /* Health status of the Astrolavos system */
@@ -173,6 +213,8 @@ private:
     char _name[6];                           /* Name of the Astrolavos device */
     uint16_t _color = 0x0000;
     SemaphoreHandle_t _health_mutex = nullptr;
+    bool _isolation_mode_triggered = false; /* Isolation mode flag */
+    bool _isolation_mode = false;           /* Isolation mode */
     const sleep_duration_t* _sleep_duration = nullptr;
 };
 

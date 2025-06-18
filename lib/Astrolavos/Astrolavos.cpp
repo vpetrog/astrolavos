@@ -9,6 +9,7 @@
  *
  */
 #include "Astrolavos.hpp"
+#include "driver/gpio.h"
 #include "esp_log.h"
 #include "esp_pm.h"
 #include "esp_timer.h"
@@ -17,6 +18,7 @@
 #include <HT_st7735_fonts.hpp>
 #include <TinyGPS++.hpp>
 #include <cmath>
+#include <pins.hpp>
 #include <utils.hpp>
 
 constexpr const char* TAG = "Astrolavos";
@@ -38,6 +40,14 @@ const sleep_duration_t normal_sleep_duration = {
     .main_app_refresh = 2000, /* 2 seconds */
     .battery = 60000,         /* 1 minute */
     .blinking = 1500          /* 3.5 seconds */
+};
+
+const sleep_duration_t isolation_sleep = {
+    .heading = 300000,        /* 5 minute */
+    .main_app_refresh = 5000, /* 5 seonds, this stays the same and instead it
+                                 changes via an if :() */
+    .battery = 300000,        /* 5 minutes */
+    .blinking = 5000          /* 5 seconds */
 };
 
 void Astrolavos::updateHealthBattery(uint8_t percentage)
@@ -334,7 +344,33 @@ AstrolavosPairedDevice* Astrolavos::getDevice(int id)
 }
 
 gnss_location_t Astrolavos::getCoordinates() { return _coordinates; }
+
 int Astrolavos::getId() { return _id; }
+
+void Astrolavos::triggerIsolationMode() { _isolation_mode_triggered = true; }
+
+bool Astrolavos::isIsolationModeTriggered()
+{
+    return _isolation_mode_triggered;
+}
+
+void Astrolavos::updateIsolationMode()
+{
+    _isolation_mode_triggered = false;
+    _isolation_mode = !_isolation_mode;
+    if (_isolation_mode)
+    {
+        _sleep_duration = &isolation_sleep;
+        _display->turn_off();
+    }
+    else
+    {
+        _sleep_duration = &normal_sleep_duration;
+        _display->turn_on();
+    }
+}
+
+bool Astrolavos::getIsolationMode() { return _isolation_mode; }
 
 void Astrolavos::refreshHealthBar()
 {
@@ -437,8 +473,32 @@ void Astrolavos::refreshDevice(int id)
     /*TODO: We could perhaps do something with the freshness */
 }
 
+void usr_button_isr_handler(void* args)
+{
+    astrolavos::Astrolavos* astrolavos_app =
+        static_cast<astrolavos::Astrolavos*>(args);
+    if (astrolavos_app)
+        astrolavos_app->triggerIsolationMode();
+}
+
+void Astrolavos::initSwitchInterrupt()
+{
+    gpio_config_t io_conf = {
+        .pin_bit_mask = 1ULL << static_cast<uint64_t>(heltec::PIN_USR_SWITCH),
+        .mode = GPIO_MODE_INPUT,
+        .pull_up_en = GPIO_PULLUP_ENABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_NEGEDGE // falling edge
+    };
+    gpio_config(&io_conf);
+
+    gpio_install_isr_service(0); // pass 0 to use default
+    gpio_isr_handler_add(heltec::PIN_USR_SWITCH, usr_button_isr_handler, this);
+}
+
 void Astrolavos::init(HT_st7735* display)
 {
+    _sleep_duration = &normal_sleep_duration;
     _display = display;
     _id = this_device.id;
     strncpy(_name, this_device.name, sizeof(_name) - 1);
@@ -465,6 +525,8 @@ void Astrolavos::init(HT_st7735* display)
     _display->unhold_pins();
     _display->fill_screen(ST7735_BLACK);
     _display->hold_pins();
+    initSwitchInterrupt();
+
     ESP_LOGI(TAG, "Astrolavos initialized with ID: %d, Name: %s", _id, _name);
 }
 } // namespace astrolavos
@@ -484,10 +546,18 @@ void astrolavos_task(void* args)
     while (true)
     {
         esp_pm_lock_acquire(lock);
-        astrolavos_app->refreshHealthBar();
-        for (int i = 0; i < ASTROLAVOS_NUMBER_OF_DEVICES; i++)
+        if (astrolavos_app->isIsolationModeTriggered())
         {
-            astrolavos_app->refreshDevice(i);
+            ESP_LOGI(TAG, "Isolation mode triggered");
+            astrolavos_app->updateIsolationMode();
+        }
+        if (!astrolavos_app->getIsolationMode())
+        {
+            astrolavos_app->refreshHealthBar();
+            for (int i = 0; i < ASTROLAVOS_NUMBER_OF_DEVICES; i++)
+            {
+                astrolavos_app->refreshDevice(i);
+            }
         }
         esp_pm_lock_release(lock);
         utils::delay_ms(astrolavos_app->getSleepDuration()->main_app_refresh);
