@@ -106,6 +106,11 @@ typedef struct
     uint16_t colour;
 } paired_device_auto_config_t;
 
+typedef struct
+{
+    gnss_location_t coordinates;
+} device_data_t;
+
 /* TODO: Any LoRa Related Structs */
 
 } // namespace astrolavos

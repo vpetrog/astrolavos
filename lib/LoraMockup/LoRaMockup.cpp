@@ -85,9 +85,11 @@ void loraMockupInitReceiver_task(void* args)
         random_coords.latitude = current_coords.latitude + lat_offset;
         random_coords.longitude = current_coords.longitude + lon_offset;
         random_coords.ts = esp_timer_get_time();
-
-        esp_err_t result = astrolavos_app->updateDeviceCoordinates(
-            target_device_id, random_coords);
+        astrolavos::device_data_t random_data = {
+            .coordinates = random_coords,
+        };
+        esp_err_t result =
+            astrolavos_app->updateDevice(target_device_id, random_data);
 
         if (result == ESP_OK)
         {

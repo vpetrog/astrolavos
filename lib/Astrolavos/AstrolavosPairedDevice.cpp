@@ -29,9 +29,9 @@ AstrolavosPairedDevice::AstrolavosPairedDevice()
 
 int AstrolavosPairedDevice::getId() { return _id; }
 
-void AstrolavosPairedDevice::updateCoordinates(gnss_location_t coordinates)
+void AstrolavosPairedDevice::updateDevice(device_data_t data)
 {
-    _coordinates = coordinates;
+    _coordinates = data.coordinates;
 }
 
 gnss_location_t AstrolavosPairedDevice::getCoordinates()

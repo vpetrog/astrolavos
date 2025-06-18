@@ -21,7 +21,7 @@ public:
     AstrolavosPairedDevice(int id, char name[6], uint16_t color);
 
     gnss_location_t getCoordinates();
-    void updateCoordinates(gnss_location_t coordinates);
+    void updateDevice(device_data_t data);
     void configure(int id, uint16_t colour, const char* name);
     uint16_t getColour();
     void setColour(uint16_t new_colour);

@@ -89,8 +89,7 @@ void Astrolavos::updateHealthMagnetometer(magnetometer_health_t status)
     xSemaphoreGive(_health_mutex);
 }
 
-int Astrolavos::updateDeviceCoordinates(int id,
-                                        const gnss_location_t coordinates)
+int Astrolavos::updateDevice(int id, const device_data_t data)
 {
     if (id < 0 || id >= ASTROLAVOS_NUMBER_OF_DEVICES)
     {
@@ -105,7 +104,7 @@ int Astrolavos::updateDeviceCoordinates(int id,
         return ESP_ERR_NOT_FOUND;
     }
 
-    device->updateCoordinates(coordinates);
+    device->updateDevice(data);
     return ESP_OK;
 }
 
