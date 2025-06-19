@@ -1,23 +1,23 @@
 /**
- * @file QMC5883L.cpp
- * @author Evangelos Petrongonas (vpetrog@ieee.org)
- * @brief
+ * @file    QMC5883L.cpp
+ * @author  Evangelos Petrongonas (vpetrog@ieee.org)
+ * @brief   Magnetometer Driver with calibration support
  * @version 0.1
- * @date 2025-06-15
+ * @date    2025-06-15
  *
  * @copyright Copyright (c) 2025
- *
  */
 #include "QMC5883L.hpp"
 #include "esp_log.h"
 #include "esp_pm.h"
 #include <Astrolavos.hpp>
 #include <HT_st7735.hpp>
+#include <algorithm>
+#include <limits>
 #include <math.h>
 #include <utils.hpp>
 
 constexpr size_t HEADING_TASK_SLEEP = 1000;
-
 constexpr const char* TAG = "QMC5883L";
 
 #if defined(QMC5883L_USE_QMC5883L)
@@ -28,8 +28,6 @@ constexpr uint8_t QMC5883L_REG_SET = 0x0B;
 constexpr uint8_t QMC5883L_REG_DATA = 0x01;
 constexpr uint8_t QMC5883L_REG_CTRL_1 = 0x0A;
 constexpr uint8_t QMC5883L_REG_CTRL_2 = 0x0B;
-
-; // Data register
 #endif
 
 #if defined(QMC5883L_USE_QMC5883L)
@@ -86,7 +84,7 @@ esp_err_t QMC5883L::init()
 esp_err_t QMC5883L::write_reg(uint8_t reg, uint8_t val)
 {
     uint8_t buf[2] = {reg, val};
-    return i2c_master_write_to_device(_port, QMC5883L_ADDR, buf, 2,
+    return i2c_master_write_to_device(_port, QMC5883L_ADDR, buf, sizeof(buf),
                                       100 / portTICK_PERIOD_MS);
 }
 
@@ -99,26 +97,106 @@ esp_err_t QMC5883L::read_bytes(uint8_t reg, uint8_t* data, size_t len)
 esp_err_t QMC5883L::read_raw(int16_t& x, int16_t& y, int16_t& z)
 {
     uint8_t buf[6];
-    esp_err_t err = read_bytes(QMC5883L_REG_DATA, buf, 6);
+    esp_err_t err = read_bytes(QMC5883L_REG_DATA, buf, sizeof(buf));
     if (err != ESP_OK)
         return err;
 
-    x = (int16_t)(buf[1] << 8 | buf[0]);
-    y = (int16_t)(buf[3] << 8 | buf[2]);
-    z = (int16_t)(buf[5] << 8 | buf[4]);
-
+    x = int16_t((buf[1] << 8) | buf[0]);
+    y = int16_t((buf[3] << 8) | buf[2]);
+    z = int16_t((buf[5] << 8) | buf[4]);
     return ESP_OK;
+}
+
+esp_err_t QMC5883L::read_calibrated(int16_t& x, int16_t& y, int16_t& z)
+{
+    esp_err_t rc = read_raw(x, y, z);
+    if (rc == ESP_OK && _isCalibrated)
+        applyCalibration(x, y, z);
+    return rc;
+}
+
+void QMC5883L::applyCalibration(int16_t& x, int16_t& y, int16_t& z)
+{
+    float xf = (x - _cal.offsetX) * _cal.scaleX;
+    float yf = (y - _cal.offsetY) * _cal.scaleY;
+    float zf = (z - _cal.offsetZ) * _cal.scaleZ;
+    x = int16_t(xf);
+    y = int16_t(yf);
+    z = int16_t(zf);
+}
+
+/* The calibration procedure is inspired by
+ * https://github.com/mprograms/QMC5883LCompass/tree/master */
+esp_err_t QMC5883L::calibrate(uint16_t samples, uint16_t delay_ms)
+{
+    ESP_LOGI(TAG, "Calibrating QMC5883L with %u samples", samples);
+    if (samples > 0)
+    {
+        _cal.minX = std::numeric_limits<int16_t>::max();
+        _cal.maxX = std::numeric_limits<int16_t>::min();
+        _cal.minY = std::numeric_limits<int16_t>::max();
+        _cal.maxY = std::numeric_limits<int16_t>::min();
+        _cal.minZ = std::numeric_limits<int16_t>::max();
+        _cal.maxZ = std::numeric_limits<int16_t>::min();
+
+        for (uint16_t i = 0; i < samples; ++i)
+        {
+            int16_t x, y, z;
+            if (read_raw(x, y, z) == ESP_OK)
+            {
+                _cal.minX = std::min(_cal.minX, x);
+                _cal.maxX = std::max(_cal.maxX, x);
+                _cal.minY = std::min(_cal.minY, y);
+                _cal.maxY = std::max(_cal.maxY, y);
+                _cal.minZ = std::min(_cal.minZ, z);
+                _cal.maxZ = std::max(_cal.maxZ, z);
+            }
+            utils::delay_ms(delay_ms);
+        }
+    }
+
+    /* Hard-iron: midpoint */
+    _cal.offsetX = (_cal.maxX + _cal.minX) * 0.5f;
+    _cal.offsetY = (_cal.maxY + _cal.minY) * 0.5f;
+    _cal.offsetZ = (_cal.maxZ + _cal.minZ) * 0.5f;
+
+    /* Soft-iron: equalize spans */
+    float spanX = (_cal.maxX - _cal.minX) * 0.5f;
+    float spanY = (_cal.maxY - _cal.minY) * 0.5f;
+    float spanZ = (_cal.maxZ - _cal.minZ) * 0.5f;
+    float avg = (spanX + spanY + spanZ) / 3.0f;
+
+    _cal.scaleX = avg / spanX;
+    _cal.scaleY = avg / spanY;
+    _cal.scaleZ = avg / spanZ;
+    ESP_LOGI(TAG,
+             "Calibration complete: "
+             "X[%d, %d], Y[%d, %d], Z[%d, %d]",
+             _cal.minX, _cal.maxX, _cal.minY, _cal.maxY, _cal.minZ, _cal.maxZ);
+    _isCalibrated = true;
+    return ESP_OK;
+}
+
+void QMC5883L::setCalibrationData(int16_t xMin, int16_t xMax, int16_t yMin,
+                                  int16_t yMax, int16_t zMin, int16_t zMax)
+{
+    _cal.minX = xMin;
+    _cal.maxX = xMax;
+    _cal.minY = yMin;
+    _cal.maxY = yMax;
+    _cal.minZ = zMin;
+    _cal.maxZ = zMax;
+    calibrate(0, 0);
 }
 
 float QMC5883L::get_heading()
 {
     int16_t x, y, z;
-    if (read_raw(x, y, z) != ESP_OK)
+    if (read_calibrated(x, y, z) != ESP_OK)
         return NAN;
-
-    float angle = atan2((float)y, (float)x) * 180.0 / M_PI;
-    if (angle < 0)
-        angle += 360.0;
+    float angle = atan2f((float)y, (float)x) * 180.0f / M_PI;
+    if (angle < 0.0f)
+        angle += 360.0f;
     return angle;
 }
 
