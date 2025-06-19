@@ -392,6 +392,11 @@ void Astrolavos::setupMode()
     esp_restart();
 }
 
+void Astrolavos::setMagnetometer(QMC5883L* magnetometer)
+{
+    _magnetometer = magnetometer;
+}
+
 void Astrolavos::refreshHealthBar()
 {
     /* The Display row is 160 pixels Wide, with at a Font size of 7x10
