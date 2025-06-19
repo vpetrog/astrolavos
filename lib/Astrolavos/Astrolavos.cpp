@@ -387,8 +387,50 @@ void Astrolavos::requestSetup() { _setup_requested = true; }
 
 void Astrolavos::setupMode()
 {
+    esp_err_t err;
     ESP_LOGI(TAG, "Entering Setup Mode");
+    _display->unhold_pins();
+    _display->fill_rectangle(0, 0, 160, Font_11x18.height, _color);
+    _display->fill_rectangle(0, 80 - Font_11x18.height, 160, 80, _color);
+
+    _display->write_str(25, Font_11x18.height, "Setup Mode", Font_11x18, _color,
+                        ST7735_BLACK);
+    utils::delay_ms(1000);
+    _display->fill_rectangle(0, 0, 160, 80, ST7735_BLACK);
+    _display->write_str(0, 0, "Compass Cal", Font_11x18, ST7735_WHITE,
+                        ST7735_BLACK);
+    _display->write_str(0, 2 * Font_11x18.height,
+                        "Keep moving slowly the device in a figure 8 for ~30s",
+                        Font_7x10, ST7735_WHITE, ST7735_BLACK);
+
+    err = _magnetometer->calibrate(1000, 25);
+    _display->fill_rectangle(0, Font_11x18.height, 160, 80 - Font_11x18.height,
+                             ST7735_BLACK);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Magnetometer calibration failed: %s",
+                 esp_err_to_name(err));
+        _display->write_str(0, Font_11x18.height, "Calibration Failed",
+                            Font_11x18, ST7735_RED, ST7735_BLACK);
+        utils::delay_ms(2000);
+        _display->fill_screen(ST7735_BLACK);
+        _display->write_str(0, 2 * Font_11x18.height, "Rebooting...",
+                            Font_11x18, ST7735_RED, ST7735_BLACK);
+    }
+    else
+    {
+        ESP_LOGI(TAG, "Magnetometer calibration successful");
+        _magnetometer->saveCalibration();
+        _display->write_str(0, Font_11x18.height * 2, "Calibration Done",
+                            Font_11x18, ST7735_GREEN, ST7735_BLACK);
+        utils::delay_ms(2500);
+        _display->fill_screen(ST7735_BLACK);
+        _display->write_str(0, 2 * Font_11x18.height, "Rebooting...",
+                            Font_11x18, ST7735_GREEN, ST7735_BLACK);
+    }
     utils::delay_ms(3000);
+    _display->hold_pins();
+
     esp_restart();
 }
 
