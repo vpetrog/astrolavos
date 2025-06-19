@@ -12,6 +12,7 @@
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "esp_pm.h"
+#include "esp_system.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -378,6 +379,19 @@ void Astrolavos::updateIWantToMeet(bool i_want_to_meet)
     _i_want_to_meet = i_want_to_meet;
 }
 
+bool Astrolavos::isBooted() { return _is_booted; }
+
+bool Astrolavos::isSetupRequested() { return _setup_requested; }
+
+void Astrolavos::requestSetup() { _setup_requested = true; }
+
+void Astrolavos::setupMode()
+{
+    ESP_LOGI(TAG, "Entering Setup Mode");
+    utils::delay_ms(3000);
+    esp_restart();
+}
+
 void Astrolavos::refreshHealthBar()
 {
     /* The Display row is 160 pixels Wide, with at a Font size of 7x10
@@ -516,7 +530,12 @@ void usr_button_isr_handler(void* args)
     astrolavos::Astrolavos* astrolavos_app =
         static_cast<astrolavos::Astrolavos*>(args);
     if (astrolavos_app)
-        astrolavos_app->triggerIsolationMode();
+    {
+        if (astrolavos_app->isBooted())
+            astrolavos_app->triggerIsolationMode();
+        else
+            astrolavos_app->requestSetup();
+    }
 }
 
 void iwtm_isr_handler(void* args)
@@ -584,13 +603,14 @@ void Astrolavos::init(HT_st7735* display)
                         Font_11x18, _color, ST7735_BLACK);
     _display->hold_pins();
     initialisePairedDevices();
+    initSwitchInterrupt();
     utils::delay_ms(ASTROLAVOS_WELCOME_SLEEP);
     _display->unhold_pins();
     _display->fill_screen(ST7735_BLACK);
     _display->hold_pins();
-    initSwitchInterrupt();
     initIWTMInterrupt();
 
+    _is_booted = true;
     ESP_LOGI(TAG, "Astrolavos initialized with ID: %d, Name: %s", _id, _name);
 }
 } // namespace astrolavos
@@ -606,7 +626,12 @@ void astrolavos_task(void* args)
     HT_st7735* display = reinterpret_cast<HT_st7735*>(task_args->display);
     ESP_LOGI(TAG, "Astrolavos Task started");
     astrolavos_app->init(display);
-    esp_pm_lock_release(lock);
+    if (astrolavos_app->isSetupRequested())
+    {
+        ESP_LOGI(TAG, "Setup requested, entering setup mode");
+        astrolavos_app->setupMode();
+        esp_pm_lock_release(lock);
+    }
     while (true)
     {
         esp_pm_lock_acquire(lock);

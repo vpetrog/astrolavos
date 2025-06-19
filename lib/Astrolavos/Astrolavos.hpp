@@ -164,6 +164,33 @@ public:
      */
     bool getIWantToMeet();
 
+    /**
+     * @brief Check if Astrolavos is booted.
+     *
+     */
+    bool isBooted();
+
+    /**
+     * @brief Check if the user has indicated that they want to perform setup
+     *
+     * @return true
+     * @return false
+     */
+    bool isSetupRequested();
+
+    /**
+     * @brief Request to enter setup instead of the main application.
+     * 
+     */
+    void requestSetup();
+
+    /**
+     * @brief Astrolavos goes into setup mode. IN this mode the user can configure
+     * various settings and operational parameters.
+     * 
+     */
+    void setupMode();
+
 private:
     /**
      * @brief Calculate the heading to the device with the given ID.
@@ -245,7 +272,9 @@ private:
     bool _isolation_mode_triggered = false; /* Isolation mode flag */
     bool _isolation_mode = false;           /* Isolation mode */
     const sleep_duration_t* _sleep_duration = nullptr;
-    bool _i_want_to_meet = false; /* Indicates whether I want to meet */
+    bool _i_want_to_meet = false;  /* Indicates whether I want to meet */
+    bool _is_booted = false;       /* Indicates whether Astrolavos is booted */
+    bool _setup_requested = false; /* Indicates whether setup is requested */
 };
 
 typedef struct
