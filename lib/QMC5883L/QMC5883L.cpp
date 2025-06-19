@@ -36,7 +36,7 @@ constexpr uint8_t QMC5883L_REG_CTRL_2 = 0x0B;
 /*
  * OSR (Over Sampling Rate) 128 (0b10000000)
  * RNG (Range) 2G               (0b00000000)
- * ODR (Output Data Rate) 10Hz  (0b00000000)
+ * ODR (Output Data Rate) 50Hz  (0b00000100)
  * MODE (Continuous Mode)       (0b00000001)
  */
 constexpr uint8_t QMC5883L_CONFIGURATION = 0b10000001;
@@ -45,7 +45,7 @@ constexpr uint8_t QMC5884L_RESET_CMD = 0x01; /* As per the datasheet */
 /*
  * OSR2 = 0b00 (1)
  * OSR1 = 0b11 (8)
- * ODR = 0b000 (10Hz)
+ * ODR = 0b01 (50Hz)
  * MODE = 0b01 (Normal Mode)
  */
 constexpr uint8_t QMC5883L_CONFIGURATION_CTRL_1 = 0b00110001;
