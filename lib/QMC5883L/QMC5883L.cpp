@@ -20,8 +20,6 @@
 
 constexpr size_t HEADING_TASK_SLEEP = 1000;
 constexpr const char* TAG = "QMC5883L";
-constexpr const char* NVS_CALIBRATION_NAMESPACE = "qmc5883l";
-constexpr const char* NVS_CALIBRATION_KEY = "cal_data";
 
 #if defined(QMC5883L_USE_QMC5883L)
 constexpr uint8_t QMC5883L_REG_CTRL1 = 0x09;
@@ -224,6 +222,18 @@ esp_err_t QMC5883L::loadCalibration(const char* ns, const char* key)
     setCalibrationData(_cal.minX, _cal.maxX, _cal.minY, _cal.maxY, _cal.minZ,
                        _cal.maxZ);
     return ESP_OK;
+}
+
+esp_err_t QMC5883L::eraseCalibration(const char* ns, const char* key)
+{
+    nvs_handle_t h;
+    esp_err_t err = nvs_open(ns, NVS_READWRITE, &h);
+    if (err != ESP_OK)
+        return err;
+
+    err = nvs_erase_key(h, key);
+    nvs_close(h);
+    return err;
 }
 
 float QMC5883L::get_heading()
