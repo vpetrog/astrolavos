@@ -28,6 +28,12 @@ void blinking_task(void* args)
 {
     astrolavos::Astrolavos* astrolavos_app =
         static_cast<astrolavos::Astrolavos*>(args);
+    size_t sleep_duration;
+    if (astrolavos_app)
+        sleep_duration =
+            astrolavos_app->getSleepDuration()->blinking;
+    else
+        sleep_duration = 1500; // Default blinking duration if no app provided
     gpio_set_direction(heltec::PIN_LED_WRITE_CTRL, GPIO_MODE_OUTPUT);
     ESP_LOGI(TAG, "Blinking Task started");
     while (true)
@@ -37,12 +43,12 @@ void blinking_task(void* args)
         gpio_set_level(heltec::PIN_LED_WRITE_CTRL, 1);
         gpio_hold_en(heltec::PIN_LED_WRITE_CTRL);
 
-        utils::delay_ms(astrolavos_app->getSleepDuration()->blinking);
+        utils::delay_ms(sleep_duration);
 
         gpio_hold_dis(heltec::PIN_LED_WRITE_CTRL);
         gpio_set_level(heltec::PIN_LED_WRITE_CTRL, 0);
         gpio_hold_en(heltec::PIN_LED_WRITE_CTRL);
-        utils::delay_ms(astrolavos_app->getSleepDuration()->blinking);
+        utils::delay_ms(sleep_duration);
     }
 }
 
@@ -65,7 +71,7 @@ extern "C" void app_main()
 
     xTaskCreate(gnss_task, "gnss_task", 4096, &display, 5, NULL);
     xTaskCreate(battery_task, "battery_task", 4096, &display, 2, NULL);
-    xTaskCreate(blinking_task, "blinking_task", 4096, &display, 3, NULL);
+    xTaskCreate(blinking_task, "blinking_task", 4096, nullptr, 3, NULL);
     xTaskCreate(heading_task, "heading_task", 4096, &display, 4, NULL);
 
     vTaskSuspend(NULL);
