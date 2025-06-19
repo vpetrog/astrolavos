@@ -309,6 +309,7 @@ void heading_astrolavos_task(void* args)
         esp_pm_lock_release(lock);
         vTaskSuspend(nullptr);
     }
+    astrolavos_app->setMagnetometer(&qmc5883l);
 
     if (qmc5883l.loadCalibration(NVS_CALIBRATION_NAMESPACE,
                                  NVS_CALIBRATION_KEY) == ESP_OK)

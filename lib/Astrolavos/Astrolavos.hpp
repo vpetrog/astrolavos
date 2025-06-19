@@ -14,8 +14,8 @@
 #include "AstrolavosPairedDevice.hpp"
 #include "Astrolavos_types.hpp"
 #include <HT_st7735.hpp>
+#include <QMC5883L.hpp>
 #include <array>
-
 #ifndef ASTROLAVOS_NUMBER_OF_DEVICES
 #define ASTROLAVOS_NUMBER_OF_DEVICES 4 // Default number of devices#
 #endif
@@ -180,16 +180,23 @@ public:
 
     /**
      * @brief Request to enter setup instead of the main application.
-     * 
+     *
      */
     void requestSetup();
 
     /**
-     * @brief Astrolavos goes into setup mode. IN this mode the user can configure
-     * various settings and operational parameters.
-     * 
+     * @brief Astrolavos goes into setup mode. IN this mode the user can
+     * configure various settings and operational parameters.
+     *
      */
     void setupMode();
+
+    /**
+     * @brief Set a pointer to the magnetometer instance.
+     *
+     * @param magnetometer
+     */
+    void setMagnetometer(QMC5883L* magnetometer);
 
 private:
     /**
@@ -264,7 +271,8 @@ private:
     health_status_t _healthStatus; /* Health status of the Astrolavos system */
     heading_t _heading;            /* Heading information of Astrolavos */
     HT_st7735* _display;           /* Reference to the display */
-    gnss_location_t _coordinates;  /* Coordinates of Astrolavos */
+    QMC5883L* _magnetometer = nullptr; /* Pointer to Magnetometer instance */
+    gnss_location_t _coordinates;      /* Coordinates of Astrolavos */
     int _id = ID_ASTROLAVOS_NOT_INITIALIZED; /* Our ID processed */
     char _name[6];                           /* Name of the Astrolavos device */
     uint16_t _color = 0x0000;
