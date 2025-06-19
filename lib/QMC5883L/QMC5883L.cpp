@@ -16,14 +16,23 @@
 #include <math.h>
 #include <utils.hpp>
 
-constexpr size_t HEADING_TASK_SLEEP = 7 * 1000;
+constexpr size_t HEADING_TASK_SLEEP = 1000;
 
 constexpr const char* TAG = "QMC5883L";
 
+#if defined(QMC5883L_USE_QMC5883L)
 constexpr uint8_t QMC5883L_REG_CTRL1 = 0x09;
 constexpr uint8_t QMC5883L_REG_DATA = 0x00;
 constexpr uint8_t QMC5883L_REG_SET = 0x0B;
+#elif defined(QMC5883L_USE_QMC5883P)
+constexpr uint8_t QMC5883L_REG_DATA = 0x01;
+constexpr uint8_t QMC5883L_REG_CTRL_1 = 0x0A;
+constexpr uint8_t QMC5883L_REG_CTRL_2 = 0x0B;
 
+; // Data register
+#endif
+
+#if defined(QMC5883L_USE_QMC5883L)
 /*
  * OSR (Over Sampling Rate) 128 (0b10000000)
  * RNG (Range) 2G               (0b00000000)
@@ -32,6 +41,19 @@ constexpr uint8_t QMC5883L_REG_SET = 0x0B;
  */
 constexpr uint8_t QMC5883L_CONFIGURATION = 0b10000001;
 constexpr uint8_t QMC5884L_RESET_CMD = 0x01; /* As per the datasheet */
+#elif defined(QMC5883L_USE_QMC5883P)
+/*
+ * OSR2 = 0b00 (1)
+ * OSR1 = 0b11 (8)
+ * ODR = 0b000 (10Hz)
+ * MODE = 0b01 (Normal Mode)
+ */
+constexpr uint8_t QMC5883L_CONFIGURATION_CTRL_1 = 0b00110001;
+/*
+ * RNG = 0B11 (2G)
+ */
+constexpr uint8_t QMC5883L_CONFIGURATION_CTRL_2 = 0b00000000;
+#endif
 
 QMC5883L::QMC5883L(i2c_port_t port, gpio_num_t sda, gpio_num_t scl)
     : _port(port), _sda(sda), _scl(scl)
@@ -48,9 +70,17 @@ esp_err_t QMC5883L::init()
                          .master = {.clk_speed = 400000}};
     ESP_ERROR_CHECK(i2c_param_config(_port, &conf));
     ESP_ERROR_CHECK(i2c_driver_install(_port, conf.mode, 0, 0, 0));
-
+#if defined(QMC5883L_USE_QMC5883L)
     write_reg(QMC5883L_REG_SET, 0x01);
     return write_reg(QMC5883L_REG_CTRL1, QMC5883L_CONFIGURATION);
+#elif defined(QMC5883L_USE_QMC5883P)
+    esp_err_t rc = 0;
+    rc = write_reg(QMC5883L_REG_CTRL_1, QMC5883L_CONFIGURATION_CTRL_1);
+    if (rc != ESP_OK)
+        return rc;
+    else
+        return write_reg(QMC5883L_REG_CTRL_2, QMC5883L_CONFIGURATION_CTRL_2);
+#endif
 }
 
 esp_err_t QMC5883L::write_reg(uint8_t reg, uint8_t val)
@@ -175,7 +205,6 @@ void heading_astrolavos_task(void* args)
                 astrolavos::magnetometer_health_t::MAGNETOMETER_ERROR);
         }
         esp_pm_lock_release(lock);
-        utils::delay_ms(astrolavos_app->getSleepDuration()
-                            ->heading);
+        utils::delay_ms(astrolavos_app->getSleepDuration()->heading);
     }
 }

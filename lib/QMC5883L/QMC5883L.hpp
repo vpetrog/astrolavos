@@ -27,8 +27,11 @@ public:
 private:
     i2c_port_t _port;
     gpio_num_t _sda, _scl;
+#if defined(QMC5883L_USE_QMC5883L)
     static constexpr uint8_t QMC5883L_ADDR = 0x0D;
-
+#elif defined(QMC5883L_USE_QMC5883P)
+    static constexpr uint8_t QMC5883L_ADDR = 0x2C;
+#endif
     esp_err_t write_reg(uint8_t reg, uint8_t val);
     esp_err_t read_bytes(uint8_t reg, uint8_t* data, size_t len);
 };
