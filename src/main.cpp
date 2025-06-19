@@ -31,14 +31,15 @@ void blinking_task(void* args)
         static_cast<astrolavos::Astrolavos*>(args);
     size_t sleep_duration;
     if (astrolavos_app)
-        sleep_duration =
-            astrolavos_app->getSleepDuration()->blinking;
+        sleep_duration = astrolavos_app->getSleepDuration()->blinking;
     else
         sleep_duration = 1500; // Default blinking duration if no app provided
     gpio_set_direction(heltec::PIN_LED_WRITE_CTRL, GPIO_MODE_OUTPUT);
     ESP_LOGI(TAG, "Blinking Task started");
     while (true)
     {
+        if (astrolavos_app)
+            sleep_duration = astrolavos_app->getSleepDuration()->blinking;
         ESP_LOGI(TAG, "Blinking");
         gpio_hold_dis(heltec::PIN_LED_WRITE_CTRL);
         gpio_set_level(heltec::PIN_LED_WRITE_CTRL, 1);
