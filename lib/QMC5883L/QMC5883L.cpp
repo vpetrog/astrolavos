@@ -10,6 +10,7 @@
 #include "QMC5883L.hpp"
 #include "esp_log.h"
 #include "esp_pm.h"
+#include "nvs_flash.h"
 #include <Astrolavos.hpp>
 #include <HT_st7735.hpp>
 #include <algorithm>
@@ -19,6 +20,8 @@
 
 constexpr size_t HEADING_TASK_SLEEP = 1000;
 constexpr const char* TAG = "QMC5883L";
+constexpr const char* NVS_CALIBRATION_NAMESPACE = "qmc5883l";
+constexpr const char* NVS_CALIBRATION_KEY = "cal_data";
 
 #if defined(QMC5883L_USE_QMC5883L)
 constexpr uint8_t QMC5883L_REG_CTRL1 = 0x09;
@@ -189,6 +192,40 @@ void QMC5883L::setCalibrationData(int16_t xMin, int16_t xMax, int16_t yMin,
     calibrate(0, 0);
 }
 
+esp_err_t QMC5883L::saveCalibration(const char* ns, const char* key) const
+{
+    nvs_handle_t h;
+    esp_err_t err = nvs_open(ns, NVS_READWRITE, &h);
+    if (err != ESP_OK)
+        return err;
+
+    err = nvs_set_blob(h, key, &_cal, sizeof(_cal));
+    if (err == ESP_OK)
+    {
+        err = nvs_commit(h);
+    }
+    nvs_close(h);
+    return err;
+}
+
+esp_err_t QMC5883L::loadCalibration(const char* ns, const char* key)
+{
+    nvs_handle_t h;
+    esp_err_t err = nvs_open(ns, NVS_READONLY, &h);
+    if (err != ESP_OK)
+        return err;
+
+    size_t required = sizeof(_cal);
+    err = nvs_get_blob(h, key, &_cal, &required);
+    nvs_close(h);
+    if (err != ESP_OK || required != sizeof(_cal))
+        return err == ESP_OK ? ESP_ERR_INVALID_SIZE : err;
+
+    setCalibrationData(_cal.minX, _cal.maxX, _cal.minY, _cal.maxY, _cal.minZ,
+                       _cal.maxZ);
+    return ESP_OK;
+}
+
 float QMC5883L::get_heading()
 {
     int16_t x, y, z;
@@ -262,6 +299,13 @@ void heading_astrolavos_task(void* args)
         esp_pm_lock_release(lock);
         vTaskSuspend(nullptr);
     }
+
+    if (qmc5883l.loadCalibration(NVS_CALIBRATION_NAMESPACE,
+                                 NVS_CALIBRATION_KEY) == ESP_OK)
+        ESP_LOGI(TAG, "Calibration loaded");
+    else
+        ESP_LOGE(TAG,
+                 "No prior calibration, Magnetometer data will be inaccurate");
 
     int16_t x, y, z;
     esp_pm_lock_release(lock);

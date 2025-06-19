@@ -13,6 +13,7 @@
 #include "esp_pm.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "nvs_flash.h"
 #include <Astrolavos.hpp>
 #include <BatteryMonitor.hpp>
 #include <HT_st7735.hpp>
@@ -55,7 +56,18 @@ void blinking_task(void* args)
 #if 0
 extern "C" void app_main()
 {
-    utils::delay_ms(1000);
+
+    esp_err_t err = nvs_flash_init();
+    if (err == ESP_ERR_NVS_NO_FREE_PAGES ||
+        err == ESP_ERR_NVS_NEW_VERSION_FOUND)
+    {
+        ESP_LOGI(TAG, "NVS Flash needs to be erased, re-initializing");
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        err = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(err);
+    ESP_LOGI(TAG, "NVS Flash initialized");
+
     HT_st7735 display;
     display.init();
     display.set_backlight(10);
@@ -81,6 +93,18 @@ extern "C" void app_main()
 {
     HT_st7735 display;
     astrolavos::Astrolavos astrolavos_app;
+
+    esp_err_t err = nvs_flash_init();
+    if (err == ESP_ERR_NVS_NO_FREE_PAGES ||
+        err == ESP_ERR_NVS_NEW_VERSION_FOUND)
+    {
+        ESP_LOGI(TAG, "NVS Flash needs to be erased, re-initializing");
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        err = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(err);
+    ESP_LOGI(TAG, "NVS Flash initialized");
+
     display.init();
     display.set_backlight(80);
     esp_pm_config_t pm_config = {

@@ -49,6 +49,12 @@ public:
     /** @brief  Retrieve last-used calibration data */
     calibration_data_t getCalibrationData() const { return _cal; }
 
+    /** @brief  Save _cal struct to NVS under given namespace & key */
+    esp_err_t saveCalibration(const char* ns, const char* key) const;
+
+    /** @brief  Load _cal struct from NVS; recompute offsets & scales */
+    esp_err_t loadCalibration(const char* ns, const char* key);
+
 private:
     i2c_port_t _port;
     gpio_num_t _sda, _scl;
