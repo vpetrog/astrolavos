@@ -14,6 +14,9 @@
 #include "driver/i2c.h"
 #include "esp_err.h"
 
+constexpr const char* NVS_CALIBRATION_NAMESPACE = "qmc5883l";
+constexpr const char* NVS_CALIBRATION_KEY = "cal_data";
+
 /** Calibration parameters container */
 typedef struct
 {
@@ -50,10 +53,21 @@ public:
     calibration_data_t getCalibrationData() const { return _cal; }
 
     /** @brief  Save _cal struct to NVS under given namespace & key */
-    esp_err_t saveCalibration(const char* ns, const char* key) const;
+    esp_err_t saveCalibration(const char* ns = NVS_CALIBRATION_NAMESPACE,
+                              const char* key = NVS_CALIBRATION_KEY) const;
 
     /** @brief  Load _cal struct from NVS; recompute offsets & scales */
     esp_err_t loadCalibration(const char* ns, const char* key);
+
+    /**
+     * @brief  Clear the calibration data from NVS.
+     *
+     * @param ns
+     * @param key
+     * @return esp_err_t
+     */
+    esp_err_t eraseCalibration(const char* ns = NVS_CALIBRATION_NAMESPACE,
+                               const char* key = NVS_CALIBRATION_KEY);
 
 private:
     i2c_port_t _port;
