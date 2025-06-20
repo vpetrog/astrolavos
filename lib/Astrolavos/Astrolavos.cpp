@@ -677,8 +677,8 @@ void astrolavos_task(void* args)
     {
         ESP_LOGI(TAG, "Setup requested, entering setup mode");
         astrolavos_app->setupMode();
-        esp_pm_lock_release(lock);
     }
+    esp_pm_lock_release(lock);
     while (true)
     {
         esp_pm_lock_acquire(lock);
