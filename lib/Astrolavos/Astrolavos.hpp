@@ -28,6 +28,8 @@ namespace astrolavos
 class Astrolavos
 {
 public:
+    Astrolavos() : _lora{} { ESP_LOGI("Astrolavos Header", "Constructing"); }
+
     void init(HT_st7735* display);
 
     /**

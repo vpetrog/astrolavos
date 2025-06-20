@@ -135,8 +135,9 @@ extern "C" void app_main()
 #endif
     xTaskCreate(lora_rx_astrolavos_task, "lora_rx_task", 4096, &astrolavos_app,
                 1, NULL);
-    xTaskCreate(lora_rx_astrolavos_task, "lora_tx_task", 4096, &astrolavos_app,
-                1, NULL);
+    // xTaskCreate(lora_tx_astrolavos_task, "lora_tx_task", 4096,
+    // &astrolavos_app,
+    //             1, NULL);
 
     vTaskSuspend(NULL);
 }

@@ -10,12 +10,13 @@ public:
     LoRa();
     void init();
     SX1262& getRadio();
+    void putRadio();
 
 private:
     EspHal hal;
     Module mod;
     SX1262 radio;
-    // TODO: Add lock
+    SemaphoreHandle_t _lock;
 };
 
 void lora_rx_astrolavos_task(void* args);
