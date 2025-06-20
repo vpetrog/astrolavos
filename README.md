@@ -29,6 +29,7 @@ There are two modes of operation:
 
 - **Isolation Mode**: When you don't care about your friends, and just want to dance. The device will keep exchanging data, as your friends might actually care about you. In this mode the display is off and the device is consuming less power. It is recommended to be on this mode when you are not actively looking for your friends. It can be activated bt pressing the small USR button on the top left corner of the device. The effect might take up to 2 seconds to take effect. In order to switch back to active mode, you need to press the button again.
 
+- **Setup Mode**: The user can enter the setup up mode by pressing the button on the top left corner of the device, when the device is booting. Setup mode allow the user to calibrate the magnetometer. The calibration parameters are stored in the Non-Volatile Memory of the device, so they will be available even after a power cycle. The calibration is done by rotating the device in all directions, until the calibration is complete. The display will show the progress of the calibration and will indicate when it is done. After the setup is completed, the device will reboot.
 
 In addition to this there is an ***I WANT TO MEET*** option which can be activated by pressing the button the bottom right corner of the device. This will send a message to all paired devices that you want to meet them. The message will be shown on their displays as well as a clear indication on you own display, that you are transmitting this message. To stop transmitting this message, you need to press the button again.
 
@@ -42,6 +43,7 @@ The software is distributed under MIT licence (see [License.md](License.md)). It
 The project is in very, very, very alpha and under heavy development. Expect functionality breaking changes, git history modifications and all the goodies that come with a greenfield project.
 
 ### 4.3 Status and Next Plan
+------------------ 🚀 MVP 🚀 -------------------
 - Dev Enviroment Setup and Board Definitions ✅
 - Basic TFT Library Driver ✅
 - GNSS Driver ✅
@@ -49,16 +51,15 @@ The project is in very, very, very alpha and under heavy development. Expect fun
 - Magnetometer Driver ✅
 - Integration and Main App 🚧
 
------------------- 🚀 MVP 🚀 -------------------
-
+---------------- 🎯 Stretch 🎯 -----------------
 - *Stretch Goal* Power Optimisation ✅
 - *Stretch Goal* Battery Monitoring ✅
 - *Stretch Goal* Isolation Mode ✅
 - *Stretch Goal* *I WANT TO MEET* mode of operation ✅
+- *Stretch Goal* Magnetometer Calibration and Setup Mode ✅
 - *Stretch Goal* Staleness Detections and Data Freshness 🎯
 
-------------------  Future Plans  -------------------
-
+----------------- ✨ Future Plans ✨ ------------------
 - Menu ✨
 - Pairing without Code ✨
 - Better Visuals, Integration with [lvgl](https://lvgl.io/)
