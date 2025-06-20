@@ -126,12 +126,27 @@ public:
     void triggerIsolationMode();
 
     /**
+     * @brief Trigger the IWTM mode. A very minimal method to be triggered
+     * from the ISR
+     * 
+     */
+    void triggerIWTM();
+
+    /**
      * @brief Check if the isolation mode is triggered
      *
      * @return true
      * @return false
      */
     bool isIsolationModeTriggered();
+
+    /**
+     * @brief Check if the I Want to Meet Mode is triggered
+     *
+     * @return true
+     * @return false
+     */
+    bool isIWMTTriggered();
 
     /**
      * @brief Update the mode of operation of Astrolavos. depending on whether
@@ -150,19 +165,9 @@ public:
     bool getIsolationMode();
 
     /**
-     * @brief Update the flag to inidicate the I wantToMeet Mode
-     *
-     * @param i_want_to_meet
+     * @brief Handle the IWTM mode trigger.
      */
-    void updateIWantToMeet(bool i_want_to_meet);
-
-    /**
-     * @brief Ge the I Want To Meet status
-     *
-     * @return true
-     * @return false
-     */
-    bool getIWantToMeet();
+    void updateIWantToMeet();
 
     /**
      * @brief Check if Astrolavos is booted.
@@ -280,7 +285,8 @@ private:
     bool _isolation_mode_triggered = false; /* Isolation mode flag */
     bool _isolation_mode = false;           /* Isolation mode */
     const sleep_duration_t* _sleep_duration = nullptr;
-    bool _i_want_to_meet = false;  /* Indicates whether I want to meet */
+    bool _i_want_to_meet = false; /* Indicates whether I want to meet */
+    bool _i_want_to_meet_mode_triggered = false; /* I Want To Meet mode flag */
     bool _is_booted = false;       /* Indicates whether Astrolavos is booted */
     bool _setup_requested = false; /* Indicates whether setup is requested */
 };
