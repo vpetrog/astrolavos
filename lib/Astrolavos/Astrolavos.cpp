@@ -12,6 +12,7 @@
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "esp_pm.h"
+#include "esp_sleep.h"
 #include "esp_system.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
@@ -349,10 +350,14 @@ int Astrolavos::getId() { return _id; }
 
 void Astrolavos::triggerIsolationMode() { _isolation_mode_triggered = true; }
 
+void Astrolavos::triggerIWTM() { _i_want_to_meet_mode_triggered = true; }
+
 bool Astrolavos::isIsolationModeTriggered()
 {
     return _isolation_mode_triggered;
 }
+
+bool Astrolavos::isIWMTTriggered() { return _i_want_to_meet_mode_triggered; }
 
 void Astrolavos::updateIsolationMode()
 {
@@ -368,15 +373,16 @@ void Astrolavos::updateIsolationMode()
         _sleep_duration = &normal_sleep_duration;
         _display->turn_on();
     }
+    gpio_intr_enable(heltec::PIN_USR_SWITCH);
 }
 
 bool Astrolavos::getIsolationMode() { return _isolation_mode; }
 
-bool Astrolavos::getIWantToMeet() { return _i_want_to_meet; }
-
-void Astrolavos::updateIWantToMeet(bool i_want_to_meet)
+void Astrolavos::updateIWantToMeet()
 {
-    _i_want_to_meet = i_want_to_meet;
+    _i_want_to_meet_mode_triggered = false;
+    _i_want_to_meet = !_i_want_to_meet;
+    gpio_intr_enable(heltec::PIN_IWTM_SWITCH);
 }
 
 bool Astrolavos::isBooted() { return _is_booted; }
@@ -579,7 +585,10 @@ void usr_button_isr_handler(void* args)
     if (astrolavos_app)
     {
         if (astrolavos_app->isBooted())
+        {
             astrolavos_app->triggerIsolationMode();
+            gpio_intr_disable(heltec::PIN_USR_SWITCH);
+        }
         else
             astrolavos_app->requestSetup();
     }
@@ -591,7 +600,8 @@ void iwtm_isr_handler(void* args)
         static_cast<astrolavos::Astrolavos*>(args);
     if (astrolavos_app)
     {
-        astrolavos_app->updateIWantToMeet(!astrolavos_app->getIWantToMeet());
+        astrolavos_app->triggerIWTM();
+        gpio_intr_disable(heltec::PIN_IWTM_SWITCH);
     }
 }
 
@@ -605,6 +615,8 @@ void Astrolavos::initSwitchInterrupt()
         .intr_type = GPIO_INTR_NEGEDGE // falling edge
     };
     gpio_config(&io_conf);
+
+    gpio_wakeup_enable(heltec::PIN_USR_SWITCH, GPIO_INTR_LOW_LEVEL);
 
     gpio_install_isr_service(0); // pass 0 to use default
     gpio_isr_handler_add(heltec::PIN_USR_SWITCH, usr_button_isr_handler, this);
@@ -620,6 +632,8 @@ void Astrolavos::initIWTMInterrupt()
         .intr_type = GPIO_INTR_NEGEDGE // falling edge
     };
     gpio_config(&io_conf);
+
+    gpio_wakeup_enable(heltec::PIN_IWTM_SWITCH, GPIO_INTR_LOW_LEVEL);
 
     gpio_install_isr_service(0); // pass 0 to use default
     gpio_isr_handler_add(heltec::PIN_IWTM_SWITCH, iwtm_isr_handler, this);
@@ -657,6 +671,8 @@ void Astrolavos::init(HT_st7735* display)
     _display->hold_pins();
     initIWTMInterrupt();
 
+    esp_sleep_enable_gpio_wakeup();
+
     _is_booted = true;
     ESP_LOGI(TAG, "Astrolavos initialized with ID: %d, Name: %s", _id, _name);
 }
@@ -686,6 +702,11 @@ void astrolavos_task(void* args)
         {
             ESP_LOGI(TAG, "Isolation mode triggered");
             astrolavos_app->updateIsolationMode();
+        }
+        if (astrolavos_app->isIWMTTriggered())
+        {
+            ESP_LOGI(TAG, "I Want To Meet mode triggered");
+            astrolavos_app->updateIWantToMeet();
         }
         if (!astrolavos_app->getIsolationMode())
         {
