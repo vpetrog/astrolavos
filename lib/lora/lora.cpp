@@ -184,17 +184,37 @@ void lora_tx_astrolavos_task(void* args)
             ESP_LOGE(TX_TAG, "Astrolavos does not have valid coordinates "
                              "cannot transmit message");
             esp_pm_lock_release(lock);
+            lora->putRadio();
             utils::delay_ms(astrolavos_app->getSleepDuration()->lora_tx);
             continue;
         }
         int16_t err =
             radio->transmit(reinterpret_cast<const uint8_t*>(&msg),
                             sizeof(astrolavos::application_message_t));
-        lora->putRadio();
         if (err != RADIOLIB_ERR_NONE)
         {
             ESP_LOGE(TX_TAG, "Failed to Transmit message: %d", err);
         }
+        /* TODO: these error checking methods can possibly be wrapped in another
+         * file */
+        if (astrolavos_app->getIsolationMode())
+        {
+            if ((err = radio->sleep()) != RADIOLIB_ERR_NONE)
+            {
+                ESP_LOGE(TX_TAG, "Failed to put radio in sleep: %d", err);
+                lora->putRadio();
+                esp_pm_lock_release(lock);
+                continue;
+            }
+        }
+        else if ((err = radio->startReceive()) != RADIOLIB_ERR_NONE)
+        {
+            ESP_LOGE(TX_TAG, "Failed to start RX: %d", err);
+            lora->putRadio();
+            esp_pm_lock_release(lock);
+            continue;
+        }
+        lora->putRadio();
         esp_pm_lock_release(lock);
 
         /*Add a random delay to avoid congestion*/
@@ -245,13 +265,13 @@ void lora_rx_astrolavos_task(void* args)
             esp_pm_lock_acquire(lock);
             SX1262* r = lora->getRadio();
 
-            /* Block Receiving more messages */
+            /* Block Receiving more messages or wakeup if sleeping */
             if (r->standby() != RADIOLIB_ERR_NONE)
             {
                 ESP_LOGE(RX_TAG, "Failed to put radio in standby: %d", err);
                 lora->putRadio();
                 esp_pm_lock_release(lock);
-                continue; // Skip to the next iteration
+                continue;
             }
 
             int len = radio->getPacketLength();
@@ -287,12 +307,27 @@ void lora_rx_astrolavos_task(void* args)
                     ESP_LOGE(RX_TAG, "Failed to read data: %d", err);
                     lora->putRadio();
                     esp_pm_lock_release(lock);
-                    continue; // Skip to the next iteration
+                    continue;
                 }
                 astrolavos_app->handleReceivedMessage(received_message);
             }
-
-            radio->startReceive();
+            if (astrolavos_app->getIsolationMode())
+            {
+                if (radio->sleep() != RADIOLIB_ERR_NONE)
+                {
+                    ESP_LOGE(RX_TAG, "Failed to put radio in sleep: %d", err);
+                    lora->putRadio();
+                    esp_pm_lock_release(lock);
+                    continue;
+                }
+            }
+            else if (radio->startReceive() != RADIOLIB_ERR_NONE)
+            {
+                ESP_LOGE(RX_TAG, "Failed to start RX: %d", err);
+                lora->putRadio();
+                esp_pm_lock_release(lock);
+                continue;
+            }
             lora->putRadio();
             esp_pm_lock_release(lock);
         }
