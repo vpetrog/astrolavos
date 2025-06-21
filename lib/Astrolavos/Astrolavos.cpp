@@ -630,7 +630,7 @@ void Astrolavos::refreshIwantToMeet()
     {
         _display->fill_rectangle(0, Y_WTM, 3 * Font_7x10.width,
                                  Font_7x10.height, _color);
-        char wtm_buf[] = "I Want To Meet\0";
+        char wtm_buf[] = "I Want To Meet";
         _display->write_str(4 * Font_7x10.width, Y_WTM, wtm_buf, Font_7x10,
                             _color, ST7735_BLACK);
         _display->fill_rectangle(20 * Font_7x10.width, Y_WTM, 160,
@@ -707,7 +707,7 @@ void Astrolavos::init(HT_st7735* display, LoRa* lora)
     _display = display;
     _lora = lora;
     _id = this_device.id;
-    strncpy(_name, this_device.name, sizeof(_name) - 1);
+    strncpy(_name, this_device.name, sizeof(_name));
     _color = this_device.colour;
     _health_mutex = xSemaphoreCreateMutex();
     _healthStatus.battery = {BATTERY_STATUS_UNKNOWN, 0};
