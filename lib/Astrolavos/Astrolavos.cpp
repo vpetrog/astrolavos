@@ -454,8 +454,7 @@ application_message_t Astrolavos::constructMessage()
 {
     application_message_t msg;
     msg.magic = ASTROLAVOS_MAGIC_CODE;
-    if (_coordinates.latitude == std::nanf("No Latitude") ||
-        _coordinates.longitude == std::nanf("No Longitude"))
+    if (std::isnan(_coordinates.latitude) || std::isnan(_coordinates.longitude))
     {
         ESP_LOGE(TAG, "Coordinates not set, cannot construct message");
         msg.id = ID_ASTROLAVOS_NOT_INITIALIZED;
