@@ -20,6 +20,7 @@
 #include <LoRaMockup.hpp>
 #include <QMC5883L.hpp>
 #include <gnss.hpp>
+#include <lora.hpp>
 #include <pins.hpp>
 #include <utils.hpp>
 
@@ -94,7 +95,7 @@ extern "C" void app_main()
 {
     HT_st7735 display;
     astrolavos::Astrolavos astrolavos_app;
-
+    LoRa lora;
     esp_err_t err = nvs_flash_init();
     if (err == ESP_ERR_NVS_NO_FREE_PAGES ||
         err == ESP_ERR_NVS_NEW_VERSION_FOUND)
@@ -108,6 +109,7 @@ extern "C" void app_main()
 
     display.init();
     display.set_backlight(80);
+    lora.init();
     esp_pm_config_t pm_config = {
         .max_freq_mhz = 240,
         .min_freq_mhz = 10,
@@ -118,6 +120,7 @@ extern "C" void app_main()
 
     astrolavos::astrolavos_args_t task_args = {
         .display = &display,
+        .lora = &lora,
         .app = &astrolavos_app,
     };
     xTaskCreate(astrolavos_task, "astrolavos_task", 4096, &task_args, 5, NULL);
@@ -132,6 +135,11 @@ extern "C" void app_main()
     xTaskCreate(loraMockupInitReceiver_task, "lora_mockup_receiver_task", 4096,
                 &astrolavos_app, 1, NULL);
 #endif
+    xTaskCreate(lora_rx_astrolavos_task, "lora_rx_task", 4096, &astrolavos_app,
+                1, NULL);
+    xTaskCreate(lora_tx_astrolavos_task, "lora_tx_task", 4096, &astrolavos_app,
+                1, NULL);
+
     vTaskSuspend(NULL);
 }
 #endif
