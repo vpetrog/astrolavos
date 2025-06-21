@@ -47,7 +47,8 @@ const sleep_duration_t normal_sleep_duration = {
 };
 
 const sleep_duration_t isolation_sleep = {
-    .heading = 300000,        /* 5 minute */
+    .heading = 30000, /* 15 seconds as we will need to update soonish after
+                         wakeup minute */
     .main_app_refresh = 5000, /* 5 seonds, this stays the same and instead it
                                  changes via an if :() */
     .battery = 300000,        /* 5 minutes */
