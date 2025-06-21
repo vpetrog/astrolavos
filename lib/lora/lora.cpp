@@ -51,10 +51,10 @@ void LoRa::init()
     }
 }
 
-SX1262& LoRa::getRadio()
+SX1262* LoRa::getRadio()
 {
     xSemaphoreTake(_lock, portMAX_DELAY);
-    return radio;
+    return &radio;
 }
 
 void LoRa::putRadio() { xSemaphoreGive(_lock); }
@@ -70,15 +70,15 @@ void lora_rx_astrolavos_task(void* args)
     utils::delay_ms(10000);
     astrolavos::Astrolavos* astrolavos_app =
         static_cast<astrolavos::Astrolavos*>(args);
-    LoRa lora{astrolavos_app->getLoRa()};
+    LoRa* lora = astrolavos_app->getLoRa();
 
     while (true)
     {
         esp_pm_lock_acquire(lock);
         ESP_LOGI(TX_TAG, "Receiving");
-        SX1262 radio{lora.getRadio()};
-        int16_t err = radio.receive(buf, BUF_SIZE);
-        lora.putRadio();
+        SX1262* radio = lora->getRadio();
+        int16_t err = radio->receive(buf, BUF_SIZE);
+        lora->putRadio();
         if (err == RADIOLIB_ERR_NONE)
         {
             // TODO: Check if buf is NULL terminated
@@ -104,7 +104,7 @@ void lora_tx_astrolavos_task(void* args)
     utils::delay_ms(10000);
     astrolavos::Astrolavos* astrolavos_app =
         static_cast<astrolavos::Astrolavos*>(args);
-    LoRa lora{astrolavos_app->getLoRa()};
+    LoRa* lora = astrolavos_app->getLoRa();
     ESP_LOGI(TX_TAG, "LoRa TX task started");
     // radio.setPacketSentAction(packet_sent_cb);
 
@@ -112,9 +112,9 @@ void lora_tx_astrolavos_task(void* args)
     {
         esp_pm_lock_acquire(lock);
         ESP_LOGI(TX_TAG, "Pinging");
-        SX1262 radio{lora.getRadio()};
-        int16_t err = radio.transmit("ping");
-        lora.putRadio();
+        SX1262* radio = lora->getRadio();
+        int16_t err = radio->transmit("ping");
+        lora->putRadio();
         if (err == RADIOLIB_ERR_NONE)
         {
             ESP_LOGI(TX_TAG, "Pinged");

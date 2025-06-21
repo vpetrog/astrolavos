@@ -444,7 +444,7 @@ void Astrolavos::setMagnetometer(QMC5883L* magnetometer)
 {
     _magnetometer = magnetometer;
 }
-LoRa& Astrolavos::getLoRa() { return _lora; }
+LoRa* Astrolavos::getLoRa() { return _lora; }
 
 void Astrolavos::refreshHealthBar()
 {
@@ -640,10 +640,11 @@ void Astrolavos::initIWTMInterrupt()
     gpio_isr_handler_add(heltec::PIN_IWTM_SWITCH, iwtm_isr_handler, this);
 }
 
-void Astrolavos::init(HT_st7735* display)
+void Astrolavos::init(HT_st7735* display, LoRa* lora)
 {
     _sleep_duration = &normal_sleep_duration;
     _display = display;
+    _lora = lora;
     _id = this_device.id;
     strncpy(_name, this_device.name, sizeof(_name) - 1);
     _color = this_device.colour;
@@ -671,7 +672,7 @@ void Astrolavos::init(HT_st7735* display)
     _display->fill_screen(ST7735_BLACK);
     _display->hold_pins();
     initIWTMInterrupt();
-    _lora.init();
+    _lora->init();
 
     esp_sleep_enable_gpio_wakeup();
 
@@ -689,8 +690,9 @@ void astrolavos_task(void* args)
         reinterpret_cast<astrolavos::astrolavos_args_t*>(args);
     astrolavos::Astrolavos* astrolavos_app = task_args->app;
     HT_st7735* display = reinterpret_cast<HT_st7735*>(task_args->display);
+    LoRa* lora = reinterpret_cast<LoRa*>(task_args->lora);
     ESP_LOGI(TAG, "Astrolavos Task started");
-    astrolavos_app->init(display);
+    astrolavos_app->init(display, lora);
     if (astrolavos_app->isSetupRequested())
     {
         ESP_LOGI(TAG, "Setup requested, entering setup mode");

@@ -30,7 +30,7 @@ class Astrolavos
 public:
     Astrolavos() : _lora{} { ESP_LOGI("Astrolavos Header", "Constructing"); }
 
-    void init(HT_st7735* display);
+    void init(HT_st7735* display, LoRa* lora);
 
     /**
      * @brief Update the battery health status.
@@ -212,7 +212,7 @@ public:
      *
      * @return LoRa object
      */
-    LoRa& getLoRa();
+    LoRa* getLoRa();
 
 private:
     /**
@@ -300,13 +300,14 @@ private:
     bool _i_want_to_meet_mode_triggered = false; /* I Want To Meet mode flag */
     bool _is_booted = false;       /* Indicates whether Astrolavos is booted */
     bool _setup_requested = false; /* Indicates whether setup is requested */
-    LoRa _lora;
+    LoRa* _lora;
 };
 
 typedef struct
 {
     HT_st7735* display;
     astrolavos::Astrolavos* app; /* Refrence to the Astrolavos instance */
+    LoRa* lora;
 } astrolavos_args_t;
 
 } // namespace astrolavos

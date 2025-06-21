@@ -86,7 +86,7 @@ public:
 
     void digitalWrite(uint32_t pin, uint32_t value) override
     {
-        ESP_LOGI("EspHal", "digitalWrite %lu %lu", pin, value);
+        // ESP_LOGI("EspHal", "digitalWrite %lu %lu", pin, value);
         if (pin == RADIOLIB_NC)
         {
             return;
@@ -99,7 +99,7 @@ public:
 
     uint32_t digitalRead(uint32_t pin) override
     {
-        ESP_LOGI("EspHal", "digitalRead %lu", pin);
+        // ESP_LOGI("EspHal", "digitalRead %lu", pin);
         if (pin == RADIOLIB_NC)
         {
             return (0);
@@ -148,13 +148,13 @@ public:
 
     void delay(unsigned long ms) override
     {
-        ESP_LOGI("EspHal", "delay %lu", ms);
+        // ESP_LOGI("EspHal", "delay %lu", ms);
         vTaskDelay(ms / portTICK_PERIOD_MS);
     }
 
     void delayMicroseconds(unsigned long us) override
     {
-        ESP_LOGI("EspHal", "delayMicroseconds %lu", us);
+        // ESP_LOGI("EspHal", "delayMicroseconds %lu", us);
         uint64_t m = (uint64_t)esp_timer_get_time();
         if (us)
         {
@@ -175,19 +175,19 @@ public:
 
     unsigned long millis() override
     {
-        ESP_LOGI("EspHal", "millis");
+        // ESP_LOGI("EspHal", "millis");
         return ((unsigned long)(esp_timer_get_time() / 1000ULL));
     }
 
     unsigned long micros() override
     {
-        ESP_LOGI("EspHal", "micros");
+        // ESP_LOGI("EspHal", "micros");
         return ((unsigned long)(esp_timer_get_time()));
     }
 
     long pulseIn(uint32_t pin, uint32_t state, unsigned long timeout) override
     {
-        ESP_LOGI("EspHal", "pulseIn %lu %lu %lu", pin, state, timeout);
+        // ESP_LOGI("EspHal", "pulseIn %lu %lu %lu", pin, state, timeout);
         if (pin == RADIOLIB_NC)
         {
             return (0);
@@ -210,7 +210,7 @@ public:
 
     void spiBegin()
     {
-        ESP_LOGI("EspHal", "spiBegin");
+        // ESP_LOGI("EspHal", "spiBegin");
         // Skip if SPI has already been initialized
         if (spi_initialized)
         {
@@ -240,11 +240,11 @@ public:
         spi_initialized = true;
     }
 
-    void spiBeginTransaction() { ESP_LOGI("EspHal", "spiBeginTransaction"); }
+    void spiBeginTransaction() { /*ESP_LOGI("EspHal", "spiBeginTransaction"); */}
 
     void spiTransfer(uint8_t* out, size_t len, uint8_t* in)
     {
-        ESP_LOGI("EspHal", "spiTransfer %p %u %p", out, len, in);
+        // ESP_LOGI("EspHal", "spiTransfer %p %u %p", out, len, in);
         if (len == 0)
         {
             return;
@@ -260,13 +260,13 @@ public:
 
     void spiEndTransaction()
     {
-        ESP_LOGI("EspHal", "spiEndTransaction");
+        //ESP_LOGI("EspHal", "spiEndTransaction");
         // nothing needs to be done here
     }
 
     void spiEnd()
     {
-        ESP_LOGI("EspHal", "spiEnd");
+        // ESP_LOGI("EspHal", "spiEnd");
         spi_bus_remove_device(this->spi);
         spi_bus_free(this->host);
         spi_initialized = false;

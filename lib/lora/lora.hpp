@@ -9,7 +9,7 @@ class LoRa
 public:
     LoRa();
     void init();
-    SX1262& getRadio();
+    SX1262* getRadio();
     void putRadio();
 
 private:

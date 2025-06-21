@@ -95,7 +95,7 @@ extern "C" void app_main()
 {
     HT_st7735 display;
     astrolavos::Astrolavos astrolavos_app;
-
+    LoRa lora;
     esp_err_t err = nvs_flash_init();
     if (err == ESP_ERR_NVS_NO_FREE_PAGES ||
         err == ESP_ERR_NVS_NEW_VERSION_FOUND)
@@ -120,6 +120,7 @@ extern "C" void app_main()
     astrolavos::astrolavos_args_t task_args = {
         .display = &display,
         .app = &astrolavos_app,
+        .lora = &lora,
     };
     xTaskCreate(astrolavos_task, "astrolavos_task", 4096, &task_args, 5, NULL);
     xTaskCreate(gnss_astrolavos_task, "gnss_task", 4096, &astrolavos_app, 4,
@@ -133,11 +134,11 @@ extern "C" void app_main()
     xTaskCreate(loraMockupInitReceiver_task, "lora_mockup_receiver_task", 4096,
                 &astrolavos_app, 1, NULL);
 #endif
-    xTaskCreate(lora_rx_astrolavos_task, "lora_rx_task", 4096, &astrolavos_app,
+    xTaskCreate(lora_rx_astrolavos_task, "lora_rx_task", 9192, &astrolavos_app,
                 1, NULL);
-    // xTaskCreate(lora_tx_astrolavos_task, "lora_tx_task", 4096,
-    // &astrolavos_app,
-    //             1, NULL);
+    xTaskCreate(lora_tx_astrolavos_task, "lora_tx_task", 4096,
+    &astrolavos_app,
+                1, NULL);
 
     vTaskSuspend(NULL);
 }
