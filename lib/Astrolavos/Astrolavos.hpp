@@ -16,6 +16,8 @@
 #include <HT_st7735.hpp>
 #include <QMC5883L.hpp>
 #include <array>
+#include <lora.hpp>
+
 #ifndef ASTROLAVOS_NUMBER_OF_DEVICES
 #define ASTROLAVOS_NUMBER_OF_DEVICES 4 // Default number of devices#
 #endif
@@ -26,7 +28,7 @@ namespace astrolavos
 class Astrolavos
 {
 public:
-    void init(HT_st7735* display);
+    void init(HT_st7735* display, LoRa* lora);
 
     /**
      * @brief Update the battery health status.
@@ -128,7 +130,7 @@ public:
     /**
      * @brief Trigger the IWTM mode. A very minimal method to be triggered
      * from the ISR
-     * 
+     *
      */
     void triggerIWTM();
 
@@ -202,6 +204,27 @@ public:
      * @param magnetometer
      */
     void setMagnetometer(QMC5883L* magnetometer);
+
+    /**
+     * @brief Get LoRa.
+     *
+     * @return LoRa object
+     */
+    LoRa* getLoRa();
+
+    /**
+     * @brief Construct an application message to be sent via LoRa.
+     *
+     * @return application_message_t
+     */
+    application_message_t constructMessage();
+
+    /**
+     * @brief Handles a received message from LoRa.
+     *
+     * @param msg
+     */
+    void handleReceivedMessage(application_message_t msg);
 
 private:
     /**
@@ -289,12 +312,14 @@ private:
     bool _i_want_to_meet_mode_triggered = false; /* I Want To Meet mode flag */
     bool _is_booted = false;       /* Indicates whether Astrolavos is booted */
     bool _setup_requested = false; /* Indicates whether setup is requested */
+    LoRa* _lora;
 };
 
 typedef struct
 {
     HT_st7735* display;
-    astrolavos::Astrolavos* app; /* Refrence to the Astrolavos instance */
+    LoRa* lora;
+    astrolavos::Astrolavos* app; /* Reference to the Astrolavos instance */
 } astrolavos_args_t;
 
 } // namespace astrolavos

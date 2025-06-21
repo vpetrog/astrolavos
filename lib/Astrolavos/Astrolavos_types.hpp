@@ -13,6 +13,10 @@
 
 #include <cstddef>
 #include <cstdint>
+
+#ifndef ASTROLAVOS_MAGIC_CODE
+#define ASTROLAVOS_MAGIC_CODE 0xE7F4 /* Magic code to check validity */
+#endif
 namespace astrolavos
 {
 
@@ -97,6 +101,8 @@ typedef struct
     std::size_t main_app_refresh;
     std::size_t battery;
     std::size_t blinking;
+    std::size_t lora_rx;
+    std::size_t lora_tx;
 } sleep_duration_t;
 
 typedef struct
@@ -114,6 +120,14 @@ typedef struct
     /*TODO: We should probably add a checksum or some sort of signature to
      * validate the authenticity/validity */
 } device_data_t;
+
+typedef struct
+{
+    uint16_t magic; /* Magic NUmber to check validity */
+    uint8_t id; /* Sender ID */
+    device_data_t payload; /* The actual Payload */
+
+} application_message_t;
 
 /* TODO: Any LoRa Related Structs */
 

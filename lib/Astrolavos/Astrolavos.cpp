@@ -41,7 +41,9 @@ const sleep_duration_t normal_sleep_duration = {
     .heading = 1000,          /* 1 second */
     .main_app_refresh = 2000, /* 2 seconds */
     .battery = 60000,         /* 1 minute */
-    .blinking = 1500          /* 3.5 seconds */
+    .blinking = 1500,         /* 1.5 seconds */
+    .lora_rx = 1000,          /* 1 second */
+    .lora_tx = 15000          /* 1 second */
 };
 
 const sleep_duration_t isolation_sleep = {
@@ -49,7 +51,9 @@ const sleep_duration_t isolation_sleep = {
     .main_app_refresh = 5000, /* 5 seonds, this stays the same and instead it
                                  changes via an if :() */
     .battery = 300000,        /* 5 minutes */
-    .blinking = 5000          /* 5 seconds */
+    .blinking = 5000,         /* 5 seconds */
+    .lora_rx = 1000,          /* 1 second */
+    .lora_tx = 15000          /* 1 second */
 };
 
 void Astrolavos::updateHealthBattery(uint8_t percentage)
@@ -444,6 +448,64 @@ void Astrolavos::setMagnetometer(QMC5883L* magnetometer)
 {
     _magnetometer = magnetometer;
 }
+LoRa* Astrolavos::getLoRa() { return _lora; }
+
+application_message_t Astrolavos::constructMessage()
+{
+    application_message_t msg;
+    msg.magic = ASTROLAVOS_MAGIC_CODE;
+    if (_coordinates.latitude == std::nanf("No Latitude") ||
+        _coordinates.longitude == std::nanf("No Longitude"))
+    {
+        ESP_LOGE(TAG, "Coordinates not set, cannot construct message");
+        msg.id = ID_ASTROLAVOS_NOT_INITIALIZED;
+        return msg;
+    }
+
+    msg.id = _id;
+    msg.payload = {
+        .coordinates = _coordinates,
+        .wants_to_meet = _i_want_to_meet,
+    };
+
+    ESP_LOGI(TAG, "Constructed message %d: Payload: Lat: %f, Lon: %f, WTM: %s",
+             msg.id, msg.payload.coordinates.latitude,
+             msg.payload.coordinates.longitude,
+             msg.payload.wants_to_meet ? "True" : "False");
+
+    return msg;
+}
+
+void Astrolavos::handleReceivedMessage(application_message_t msg)
+{
+    if (msg.magic != ASTROLAVOS_MAGIC_CODE)
+    {
+        ESP_LOGE(TAG, "Invalid message magic: %04X", msg.magic);
+        return;
+    }
+
+    if (msg.id == ID_ASTROLAVOS_NOT_INITIALIZED)
+    {
+        ESP_LOGE(TAG, "Received message with uninitialized ID");
+        return;
+    }
+
+    ESP_LOGI(TAG,
+             "Handling received message from ID: %d, Payload: Lat: %f, Lon: "
+             "%f, WTM: %s",
+             msg.id, msg.payload.coordinates.latitude,
+             msg.payload.coordinates.longitude,
+             msg.payload.wants_to_meet ? "True" : "False");
+    AstrolavosPairedDevice* device = getDevice(msg.id);
+    if (!device)
+    {
+        ESP_LOGE(TAG, "Device with ID %d not found", msg.id);
+        return;
+    }
+
+    device_data_t data = msg.payload;
+    device->updateDevice(data);
+}
 
 void Astrolavos::refreshHealthBar()
 {
@@ -639,10 +701,11 @@ void Astrolavos::initIWTMInterrupt()
     gpio_isr_handler_add(heltec::PIN_IWTM_SWITCH, iwtm_isr_handler, this);
 }
 
-void Astrolavos::init(HT_st7735* display)
+void Astrolavos::init(HT_st7735* display, LoRa* lora)
 {
     _sleep_duration = &normal_sleep_duration;
     _display = display;
+    _lora = lora;
     _id = this_device.id;
     strncpy(_name, this_device.name, sizeof(_name) - 1);
     _color = this_device.colour;
@@ -687,8 +750,9 @@ void astrolavos_task(void* args)
         reinterpret_cast<astrolavos::astrolavos_args_t*>(args);
     astrolavos::Astrolavos* astrolavos_app = task_args->app;
     HT_st7735* display = reinterpret_cast<HT_st7735*>(task_args->display);
+    LoRa* lora = reinterpret_cast<LoRa*>(task_args->lora);
     ESP_LOGI(TAG, "Astrolavos Task started");
-    astrolavos_app->init(display);
+    astrolavos_app->init(display, lora);
     if (astrolavos_app->isSetupRequested())
     {
         ESP_LOGI(TAG, "Setup requested, entering setup mode");
