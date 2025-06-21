@@ -20,8 +20,8 @@
 namespace astrolavos
 {
 
-constexpr int ID_ASTROLAVOS_NOT_INITIALIZED =
-    -1; /* Astrolavos not initialized */
+constexpr uint8_t ID_ASTROLAVOS_NOT_INITIALIZED =
+    0xff; /* Astrolavos not initialized */
 
 constexpr uint8_t BATTERY_STATUS_UNKNOWN = 0xff; /* Battery status unknown */
 
