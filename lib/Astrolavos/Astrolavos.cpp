@@ -42,8 +42,8 @@ const sleep_duration_t normal_sleep_duration = {
     .main_app_refresh = 2000, /* 2 seconds */
     .battery = 60000,         /* 1 minute */
     .blinking = 1500,         /* 1.5 seconds */
-    .lora_rx = 1000,          /* 1 second */
-    .lora_tx = 15000          /* 1 second */
+    .lora_rx = 500,           /* 1 second */
+    .lora_tx = 15000          /* 15 second */
 };
 
 const sleep_duration_t isolation_sleep = {
@@ -53,8 +53,8 @@ const sleep_duration_t isolation_sleep = {
                                  changes via an if :() */
     .battery = 300000,        /* 5 minutes */
     .blinking = 5000,         /* 5 seconds */
-    .lora_rx = 1000,          /* 1 second */
-    .lora_tx = 15000          /* 1 second */
+    .lora_rx = 15000,         /* 1 second */
+    .lora_tx = 15000          /* 15 second */
 };
 
 void Astrolavos::updateHealthBattery(uint8_t percentage)
@@ -371,11 +371,21 @@ void Astrolavos::updateIsolationMode()
     if (_isolation_mode)
     {
         _sleep_duration = &isolation_sleep;
+        _lora->getRadio()->sleep();
+        _lora->putRadio();
         _display->turn_off();
     }
     else
     {
         _sleep_duration = &normal_sleep_duration;
+        SX1262* radio = _lora->getRadio();
+        if (radio->standby() != RADIOLIB_ERR_NONE)
+            ESP_LOGE(
+                TAG,
+                "Failed to set radio to standby after isolation mode is off");
+        else if (radio->startReceive() != RADIOLIB_ERR_NONE)
+            ESP_LOGE(TAG, "Failed to start RX after isolation mode is off");
+        _lora->putRadio();
         _display->turn_on();
     }
     gpio_intr_enable(heltec::PIN_USR_SWITCH);
