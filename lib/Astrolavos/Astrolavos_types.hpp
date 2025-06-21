@@ -71,8 +71,8 @@ typedef struct
 
 typedef struct
 {
-    double latitude;  /* Latitude in degrees or NaN if not available */
-    double longitude; /* Longitude in degrees or NaN if not available */
+    float latitude;  /* Latitude in degrees or NaN if not available */
+    float longitude; /* Longitude in degrees or NaN if not available */
     int64_t ts;       /* Timestamp of the last update in usec */
 } gnss_location_t;
 
