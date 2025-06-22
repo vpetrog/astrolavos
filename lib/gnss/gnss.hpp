@@ -1,12 +1,12 @@
 /**
  * @file gnss.hpp
  * @author Evangelos Petrongonas (vpetrog@ieee.org)
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2025-06-14
- * 
+ *
  * @copyright Copyright (c) 2025
- * 
+ *
  */
 
 #pragma once

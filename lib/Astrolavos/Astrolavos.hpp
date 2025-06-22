@@ -18,7 +18,6 @@
 #include <array>
 #include <lora.hpp>
 
-
 namespace astrolavos
 {
 

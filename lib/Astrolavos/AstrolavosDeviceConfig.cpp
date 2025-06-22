@@ -3,16 +3,13 @@
 
 namespace astrolavos
 {
-paired_device_auto_config_t paired_device_auto_config[ASTROLAVOS_NUMBER_OF_DEVICES] = {
-    {0, "Evan", 0x07FF},
-    {1, "Fotis", 0x07E0},
-    {2, "Bob", 0xF800},
-    {3, "Alice", 0xF81F}
-};
+paired_device_auto_config_t
+    paired_device_auto_config[ASTROLAVOS_NUMBER_OF_DEVICES] = {
+        {0, "Evan", 0x07FF},
+        {1, "Fotis", 0x07E0},
+        {2, "Bob", 0xF800},
+        {3, "Alice", 0xF81F}};
 
 paired_device_auto_config_t this_device = {
-    .id = 0,
-    .name = "Evan",
-    .colour = 0x07FF
-};
+    .id = 0, .name = "Evan", .colour = 0x07FF};
 } // namespace astrolavos

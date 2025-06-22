@@ -77,7 +77,7 @@ typedef struct
 {
     float latitude;  /* Latitude in degrees or NaN if not available */
     float longitude; /* Longitude in degrees or NaN if not available */
-    int64_t ts;       /* Timestamp of the last update in usec */
+    int64_t ts;      /* Timestamp of the last update in usec */
 } gnss_location_t;
 
 typedef struct
@@ -127,8 +127,8 @@ typedef struct
 
 typedef struct
 {
-    uint16_t magic; /* Magic NUmber to check validity */
-    uint8_t id; /* Sender ID */
+    uint16_t magic;        /* Magic NUmber to check validity */
+    uint8_t id;            /* Sender ID */
     device_data_t payload; /* The actual Payload */
 
 } application_message_t;

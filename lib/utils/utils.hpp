@@ -14,4 +14,4 @@ namespace utils
 {
 /* -----------------------------  Helper macros ----------------------------- */
 static inline void delay_ms(uint32_t ms) { vTaskDelay(pdMS_TO_TICKS(ms)); }
-}
+} // namespace utils
