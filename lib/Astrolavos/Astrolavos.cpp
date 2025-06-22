@@ -771,7 +771,6 @@ void astrolavos_task(void* args)
     esp_pm_lock_release(lock);
     while (true)
     {
-        esp_pm_lock_acquire(lock);
         if (astrolavos_app->isIsolationModeTriggered())
         {
             ESP_LOGI(TAG, "Isolation mode triggered");
@@ -784,6 +783,8 @@ void astrolavos_task(void* args)
         }
         if (!astrolavos_app->getIsolationMode())
         {
+            esp_pm_lock_acquire(lock);
+
             astrolavos_app->refreshHealthBar();
             astrolavos_app->refreshIwantToMeet();
             for (int i = 0; i < ASTROLAVOS_NUMBER_OF_DEVICES; i++)
