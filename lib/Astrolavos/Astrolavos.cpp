@@ -96,7 +96,7 @@ void Astrolavos::updateHealthMagnetometer(magnetometer_health_t status)
     xSemaphoreGive(_health_mutex);
 }
 
-int Astrolavos::updateDevice(int id, const device_data_t data)
+int Astrolavos::updateDevice(int id, const device_data_t& data)
 {
     if (id < 0 || id >= ASTROLAVOS_NUMBER_OF_DEVICES)
     {
@@ -463,7 +463,7 @@ LoRa* Astrolavos::getLoRa() { return _lora; }
 
 application_message_t Astrolavos::constructMessage()
 {
-    application_message_t msg;
+    application_message_t msg{};
     msg.magic = ASTROLAVOS_MAGIC_CODE;
     if (std::isnan(_coordinates.latitude) || std::isnan(_coordinates.longitude))
     {

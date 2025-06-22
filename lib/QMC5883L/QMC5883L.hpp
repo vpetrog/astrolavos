@@ -50,7 +50,7 @@ public:
                             int16_t yMax, int16_t zMin, int16_t zMax);
 
     /** @brief  Retrieve last-used calibration data */
-    calibration_data_t getCalibrationData() const { return _cal; }
+    const calibration_data_t& getCalibrationData() const { return _cal; }
 
     /** @brief  Save _cal struct to NVS under given namespace & key */
     esp_err_t saveCalibration(const char* ns = NVS_CALIBRATION_NAMESPACE,
