@@ -54,8 +54,18 @@ void LoRa::init()
     // https://github.com/IanBurwell/DynamicLRS/blob/c26f7f8dcca0c1b70af0aa6aee3aba3a1652aba6/sdkconfig.ht_tracker
     // for the pins
     _lock = xSemaphoreCreateMutex();
-    int16_t err = radio.begin();
-    radio.setSyncWord(ASTROLAVOS_LORA_SYNC_WORD);
+    constexpr float LORA_FREQ = 869.4; /* Frequency in Mhz */
+    constexpr float LORA_BW = 31.0;    /* Bandwidth in kHz */
+    constexpr uint8_t LORA_SF = 9;     /* Spreading Factor */
+    constexpr uint8_t LORA_CR = 7;     /* Coding Rate */
+    constexpr uint8_t LORA_SYNCWORD = ASTROLAVOS_LORA_SYNC_WORD; /* Sync Word */
+    constexpr int8_t LORA_POWER = 21;          /* Output Power in dBm */
+    constexpr uint16_t LORA_PREAMBLE = 8;      /* Preamble Length in symbols */
+    constexpr float LORA_TCXO_VOLTAGE = 1.6;   /* TCXO Voltage in V */
+    constexpr bool LORA_LDO_REGULATOR = false; /* Use LDO Regulator */
+    int16_t err = radio.begin(LORA_FREQ, LORA_BW, LORA_SF, LORA_CR,
+                              LORA_SYNCWORD, LORA_POWER, LORA_PREAMBLE,
+                              LORA_TCXO_VOLTAGE, LORA_LDO_REGULATOR);
 
     if (err == RADIOLIB_ERR_NONE)
     {
