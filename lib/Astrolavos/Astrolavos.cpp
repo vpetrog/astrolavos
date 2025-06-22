@@ -35,7 +35,7 @@ constexpr size_t ASTROLAVOS_WELCOME_SLEEP = 3 * 1000;
 
 constexpr float EARTH_RADIUS_M = 6371000.0f; // Radius of the Earth in meters
 
-constexpr float ASTROLAVOS_MAXIMUM_ACCEPTABLE_DISTANCE = 30000; /* 30km */
+constexpr float ASTROLAVOS_MAXIMUM_ACCEPTABLE_DISTANCE = 10000; /* 10km */
 
 const sleep_duration_t normal_sleep_duration = {
     .heading = 1000,          /* 1 second */
@@ -43,7 +43,7 @@ const sleep_duration_t normal_sleep_duration = {
     .battery = 60000,         /* 1 minute */
     .blinking = 1500,         /* 1.5 seconds */
     .lora_rx = 500,           /* 1 second */
-    .lora_tx = 15000          /* 15 second */
+    .lora_tx = 45000          /* 45 second */
 };
 
 const sleep_duration_t isolation_sleep = {
@@ -54,7 +54,7 @@ const sleep_duration_t isolation_sleep = {
     .battery = 300000,        /* 5 minutes */
     .blinking = 5000,         /* 5 seconds */
     .lora_rx = 15000,         /* 1 second */
-    .lora_tx = 15000          /* 15 second */
+    .lora_tx = 45000          /* 45 second */
 };
 
 void Astrolavos::updateHealthBattery(uint8_t percentage)
