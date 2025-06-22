@@ -43,7 +43,9 @@ const sleep_duration_t normal_sleep_duration = {
     .battery = 60000,         /* 1 minute */
     .blinking = 1500,         /* 1.5 seconds */
     .lora_rx = 500,           /* 1 second */
-    .lora_tx = 45000          /* 45 second */
+    .lora_tx = 45000,         /* 45 second */
+    .gnss = 20000, /* 20 seconds We need a balance between calculating our
+                     distance to other and saving powr scanning sleep */
 };
 
 const sleep_duration_t isolation_sleep = {
@@ -54,7 +56,9 @@ const sleep_duration_t isolation_sleep = {
     .battery = 300000,        /* 5 minutes */
     .blinking = 5000,         /* 5 seconds */
     .lora_rx = 15000,         /* 1 second */
-    .lora_tx = 45000          /* 45 second */
+    .lora_tx = 45000,         /* 45 second */
+    .gnss = 45000, /* 45 seconds We are not actively tring to find anyone else,
+                      so roughly sync it with the tx sleep */
 };
 
 void Astrolavos::updateHealthBattery(uint8_t percentage)

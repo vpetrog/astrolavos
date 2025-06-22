@@ -107,6 +107,7 @@ typedef struct
     std::size_t blinking;
     std::size_t lora_rx;
     std::size_t lora_tx;
+    std::size_t gnss;
 } sleep_duration_t;
 
 typedef struct
