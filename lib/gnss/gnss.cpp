@@ -148,7 +148,8 @@ void gnss_astrolavos_task(void* args)
                 static_cast<uint8_t>(gps.satellites.value()));
             astrolavos_app->updateCoordinates(
                 {static_cast<float>(gps.location.lat()),
-                 static_cast<float>(gps.location.lng()), esp_timer_get_time()});
+                 static_cast<float>(gps.location.lng()),
+                 static_cast<uint32_t>(esp_timer_get_time())});
             gnss_power_down();
             esp_pm_lock_release(lock);
             utils::delay_ms(GNSS_TASK_LOCATED_SLEEP);
