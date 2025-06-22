@@ -18,9 +18,6 @@
 #include <array>
 #include <lora.hpp>
 
-#ifndef ASTROLAVOS_NUMBER_OF_DEVICES
-#define ASTROLAVOS_NUMBER_OF_DEVICES 4 // Default number of devices#
-#endif
 
 namespace astrolavos
 {
