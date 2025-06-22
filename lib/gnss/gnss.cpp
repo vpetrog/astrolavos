@@ -140,7 +140,7 @@ void gnss_astrolavos_task(void* args)
         if (gps.location.isUpdated())
         {
             ESP_LOGI(TAG,
-                     "GNSS Data Updated,nUM Satellites: %lu, "
+                     "GNSS Data Updated,Num Satellites: %lu, "
                      "Lat: %.5f, Lon: %.5f",
                      gps.satellites.value(), gps.location.lat(),
                      gps.location.lng());
@@ -152,7 +152,7 @@ void gnss_astrolavos_task(void* args)
                  static_cast<uint32_t>(esp_timer_get_time())});
             gnss_power_down();
             esp_pm_lock_release(lock);
-            utils::delay_ms(GNSS_TASK_LOCATED_SLEEP);
+            utils::delay_ms(astrolavos_app->getSleepDuration()->gnss);
         }
         else
         {
