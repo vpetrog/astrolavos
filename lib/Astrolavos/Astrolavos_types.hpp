@@ -14,6 +14,10 @@
 #include <cstddef>
 #include <cstdint>
 
+#ifndef ASTROLAVOS_NUMBER_OF_DEVICES
+#define ASTROLAVOS_NUMBER_OF_DEVICES 4 // Default number of devices#
+#endif
+
 #ifndef ASTROLAVOS_MAGIC_CODE
 #define ASTROLAVOS_MAGIC_CODE 0xE7F4 /* Magic code to check validity */
 #endif
