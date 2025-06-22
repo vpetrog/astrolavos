@@ -1,0 +1,137 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Cache PlatformIO
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.platformio/.cache
+          ~/.platformio/packages
+          ~/.platformio/platforms
+        key: ${{ runner.os }}-pio-${{ hashFiles('**/platformio.ini') }}
+        restore-keys: |
+          ${{ runner.os }}-pio-
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install PlatformIO
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade platformio
+    
+    - name: Build project
+      run: |
+        pio run
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Install cppcheck
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cppcheck
+
+    - name: Run cppcheck
+      run: |
+        cppcheck \
+          --enable=performance,warning \
+          --error-exitcode=1 \
+          --check-level=exhaustive \
+          --xml \
+          --output-file=cppcheck-report.xml \
+          src/ lib/ -ilib/TinyGPSPlus
+
+    - name: Display cppcheck summary
+      if: always()
+      run: |
+        echo "=== Cppcheck Summary ==="
+        if [ -f cppcheck-report.xml ]; then
+          # Count issues by severity
+          echo "Errors: $(grep -c 'severity="error"' cppcheck-report.xml || echo 0)"
+          echo "Warnings: $(grep -c 'severity="warning"' cppcheck-report.xml || echo 0)"
+          echo "Performance issues: $(grep -c 'severity="performance"' cppcheck-report.xml || echo 0)"
+          echo "Information: $(grep -c 'severity="information"' cppcheck-report.xml || echo 0)"
+          
+          # Show first few issues if any
+          if grep -q 'severity="error"' cppcheck-report.xml; then
+            echo ""
+            echo "First few errors found:"
+            grep 'severity="error"' cppcheck-report.xml | head -5
+          fi
+        else
+          echo "No cppcheck report generated"
+        fi
+
+  formatting-check:
+    name: Formatting Check
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install clang-format
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-format
+    
+    - name: Check code formatting
+      run: |
+        # Check if .clang-format exists
+        if [ -f .clang-format ]; then
+          STYLE_ARG="--style=file"
+        else
+          echo "No .clang-format found, using Mozilla style"
+          STYLE_ARG="--style=Mozilla"
+        fi
+        
+        # Find all C++ files and check formatting
+        FORMAT_ISSUES=0
+        echo "Checking formatting in src/ and lib/ directories..."
+        
+        for dir in src lib; do
+          if [ -d "$dir" ]; then
+            echo "Checking $dir/..."
+            find src lib -path "lib/TinyGPSPlus/*" -prune -o \( -name "*.cpp" -o -name "*.hpp" -o -name "*.c" -o -name "*.h" \) -print | while read file; do
+              echo "Checking $file..."
+              if ! clang-format $STYLE_ARG --dry-run --Werror "$file" 2>/dev/null; then
+                echo "❌ $file is not properly formatted"
+                echo "To fix, run: clang-format $STYLE_ARG -i $file"
+                exit 1
+              else
+                echo "✅ $file is properly formatted"
+              fi
+            done
+          fi
+        done

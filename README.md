@@ -1,6 +1,9 @@
 ![Astrolavos Logo](assets/Astrolavos.svg)
 
 A Festival Friend Finder based on [Heltec Wireless Tracker](https://heltec.org/project/wireless-tracker/)
+
+[![CI/CD Pipeline](https://github.com/vpetrog/astrolavos/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/vpetrog/astrolavos/actions/workflows/ci.yml)
+
 Astrolavos (*Ancient Greek: ἀστρολάβος*) is an astronomical instrument dating to the ancient time and served as a chart for the stars.
 You and your friends are unique stars in the festival sky, and Astrolavos will help you find each other (#cringe)
 
