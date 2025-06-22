@@ -188,9 +188,8 @@ void lora_tx_astrolavos_task(void* args)
             utils::delay_ms(astrolavos_app->getSleepDuration()->lora_tx);
             continue;
         }
-        int16_t err =
-            radio->transmit(reinterpret_cast<const uint8_t*>(&msg),
-                            sizeof(astrolavos::application_message_t));
+        err = radio->transmit(reinterpret_cast<const uint8_t*>(&msg),
+                              sizeof(astrolavos::application_message_t));
         if (err != RADIOLIB_ERR_NONE)
         {
             ESP_LOGE(TX_TAG, "Failed to Transmit message: %d", err);

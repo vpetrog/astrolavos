@@ -30,7 +30,7 @@ AstrolavosPairedDevice::AstrolavosPairedDevice()
 
 int AstrolavosPairedDevice::getId() { return _id; }
 
-void AstrolavosPairedDevice::updateDevice(device_data_t data)
+void AstrolavosPairedDevice::updateDevice(const device_data_t& data)
 {
     _coordinates = data.coordinates;
     _wants_to_meet = data.wants_to_meet;

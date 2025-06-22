@@ -58,7 +58,7 @@ public:
      * @return esp_err_t 0 on success, or an error code on failure.TODO: error
      * codes
      */
-    esp_err_t updateDevice(int id, const device_data_t data);
+    esp_err_t updateDevice(int id, const device_data_t& data);
 
     /**
      * @brief Update the heading of astrolavos
