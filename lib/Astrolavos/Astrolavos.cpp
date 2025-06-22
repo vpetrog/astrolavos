@@ -546,7 +546,7 @@ void Astrolavos::refreshHealthBar()
     {
         case MAGNETOMETER_HEALTHY:
             snprintf(mag_status, sizeof(mag_status), "%u",
-                     static_cast<uint16_t>(_heading.heading) % 1000);
+                     static_cast<unsigned int>(_heading.heading) % 1000);
             break;
         case MAGNETOMETER_ERROR:
             snprintf(mag_status, sizeof(mag_status), "xxx");
