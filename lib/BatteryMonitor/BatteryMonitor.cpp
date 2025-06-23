@@ -24,7 +24,7 @@ static constexpr size_t BATTERY_TASK_SLEEP = 1 * 60 * 1000; // 1 minute
 uint8_t BatteryMonitor::voltage_to_percent(float v)
 {
     if (v >= 4.20f)
-        return 100;
+        return 99;
     if (v >= 4.15f)
         return 95;
     if (v >= 4.10f)
