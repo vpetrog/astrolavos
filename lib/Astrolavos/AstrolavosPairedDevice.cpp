@@ -11,6 +11,7 @@
 
 #include "AstrolavosPairedDevice.hpp"
 #include "esp_log.h"
+#include "esp_timer.h"
 #include <cmath>
 #include <cstring>
 
@@ -33,6 +34,7 @@ int AstrolavosPairedDevice::getId() { return _id; }
 void AstrolavosPairedDevice::updateDevice(const device_data_t& data)
 {
     _coordinates = data.coordinates;
+    _coordinates.ts = static_cast<uint32_t>(esp_timer_get_time());
     _wants_to_meet = data.wants_to_meet;
 }
 
