@@ -54,6 +54,7 @@ constexpr uint8_t ST7735_ROTATION =
 #define ST7735_MAGENTA 0xF81F
 #define ST7735_YELLOW 0xFFE0
 #define ST7735_WHITE 0xFFFF
+#define ST7735_ORANGE 0xFD20
 #define ST7735_COLOR565(r, g, b)                                               \
     (((r & 0xF8) << 8) | ((g & 0xFC) << 3) | ((b & 0xF8) >> 3))
 

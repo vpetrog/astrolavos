@@ -18,6 +18,9 @@
 namespace astrolavos
 
 {
+constexpr int64_t ASTROLAVOS_STALE_THRESHOLD =
+    5 * 60 * 1000 * 1000; /* 5 minutes in us*/
+
 AstrolavosPairedDevice::AstrolavosPairedDevice()
 {
     _id = ID_ASTROLAVOS_NOT_INITIALIZED; // Default ID for uninitialized device
@@ -62,6 +65,16 @@ void AstrolavosPairedDevice::setColour(uint16_t new_colour)
 uint16_t AstrolavosPairedDevice::getColour() { return _colour; }
 
 const char* AstrolavosPairedDevice::getName() { return _name; }
+
+bool AstrolavosPairedDevice::isStale() const
+{
+    /* A device is considered stale if it has not been updated for more than
+     * ASTROLAVOS_STALE_THRESHOLD */
+    return (esp_timer_get_time() - static_cast<int64_t>(_coordinates.ts) >
+            ASTROLAVOS_STALE_THRESHOLD)
+               ? true
+               : false;
+}
 
 void AstrolavosPairedDevice::setName(const char* new_name)
 {
