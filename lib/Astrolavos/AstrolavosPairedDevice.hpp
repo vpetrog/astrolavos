@@ -27,6 +27,7 @@ public:
     void setColour(uint16_t new_colour);
     const char* getName();
     void setName(const char* new_name);
+    bool isStale() const;
     bool isActive();
     void setActive(bool active);
     int getId();

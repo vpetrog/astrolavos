@@ -608,14 +608,21 @@ void Astrolavos::refreshDevice(int id)
         snprintf(buf_data, sizeof(buf_data), " %dm go %s (%d)", distance_int,
                  direction_buf, target_absolute_heading_int);
         i_want_to_meet = device->getWantsToMeet();
-        if (i_want_to_meet)
+        if (i_want_to_meet && !device->isStale())
             bg_color = ST7735_WHITE;
-
+        else if (i_want_to_meet && device->isStale())
+            bg_color = ST7735_YELLOW;
+        else if (!i_want_to_meet && device->isStale())
+            bg_color = ST7735_RED;
+        else
+            bg_color = ST7735_BLACK;
         ESP_LOGI(TAG,
-                 "Device %d: Distance: %dm, Absolute Heading: %d°, WTM: %s", id,
-                 static_cast<int>(distance),
+                 "Device %d: Distance: %dm, Absolute Heading: %d°, WTM: %s "
+                 "Stale: %s",
+                 id, static_cast<int>(distance),
                  static_cast<int>(target_absolute_heading),
-                 i_want_to_meet ? "True" : "False");
+                 i_want_to_meet ? "True" : "False",
+                 device->isStale() ? "True" : "False");
     }
     else
     {
