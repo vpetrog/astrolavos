@@ -55,7 +55,7 @@ void LoRa::init()
     // for the pins
     _lock = xSemaphoreCreateMutex();
     constexpr float LORA_FREQ = 869.4; /* Frequency in Mhz */
-    constexpr float LORA_BW = 31.0;    /* Bandwidth in kHz */
+    constexpr float LORA_BW = 20.0;    /* Bandwidth in kHz */
     constexpr uint8_t LORA_SF = 9;     /* Spreading Factor */
     constexpr uint8_t LORA_CR = 7;     /* Coding Rate */
     constexpr uint8_t LORA_SYNCWORD = ASTROLAVOS_LORA_SYNC_WORD; /* Sync Word */
